@@ -17,6 +17,9 @@ body{font-family:'Readex Pro',system-ui,sans-serif;background:#060606;color:#fff
 #search-input:focus{border-color:rgba(230,51,41,.5)!important}
 #search-input::placeholder{color:rgba(255,255,255,.2)}
 .sr-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background .2s}
+.currency-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background .2s;font-size:12px;letter-spacing:.03em}
+.currency-item:hover{background:rgba(255,255,255,.06)}
+.currency-item.active{color:#e63329}
 .sr-item:hover{background:rgba(255,255,255,.06)}
 .sr-img{width:42px;height:52px;border-radius:5px;object-fit:cover;background:#0a0a0a;flex-shrink:0}
 .sr-name{font-size:11px;font-weight:700;text-transform:uppercase;color:#fff;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -79,6 +82,7 @@ section{position:relative;z-index:1}
 .ticker-track span{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.38);padding:0 28px}
 .ticker-track .dot{color:#e63329;padding:0}
 @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes spin{to{transform:rotate(360deg)}}
 .hero-bot-grad{pointer-events:none;position:absolute;bottom:0;left:0;right:0;height:180px;background:linear-gradient(to bottom,transparent,#060606);z-index:9}
 #marquee-section{padding:56px 0;overflow:hidden;border-top:1px solid rgba(255,255,255,.06)}
 .mtrack{display:inline-flex;animation:mscroll 22s linear infinite}
@@ -459,6 +463,12 @@ footer{padding:60px 24px 40px;border-top:1px solid rgba(255,255,255,.06);max-wid
         <div id="search-results" style="margin-top:12px;max-height:340px;overflow-y:auto"></div>
       </div>
     </div>
+    <div id="currency-wrap" style="position:relative">
+      <div class="nav-icon-btn" onclick="toggleCurrencyMenu()" id="currency-btn" title="Currency" style="width:auto;padding:0 10px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;gap:4px">
+        <span id="currency-label">ZAR</span>
+      </div>
+      <div id="currency-dropdown" style="display:none;position:absolute;top:52px;right:0;width:180px;background:rgba(6,6,6,.97);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:8px;z-index:999;box-shadow:0 40px 80px rgba(0,0,0,.9)"></div>
+    </div>
     <div class="nav-icon-btn" onclick="openAccount()" title="Account">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
     </div>
@@ -698,6 +708,14 @@ footer{padding:60px 24px 40px;border-top:1px solid rgba(255,255,255,.06);max-wid
     <div class="account-panel active" id="tab-login">
       <div id="login-form"><div class="auth-card"><div class="auth-title">Welcome back</div><div class="auth-sub">sign in to your m.u.d misunderstood account</div><div class="form-group"><label class="form-label">email</label><input class="form-input" type="email" id="loginEmail" placeholder="your@email.com"/></div><div class="form-group"><label class="form-label">password</label><input class="form-input" type="password" id="loginPass" placeholder="••••••••"/></div><button class="form-btn" onclick="doLogin()">sign in</button><div class="form-switch">don't have an account? <span onclick="showRegister()">create one</span></div></div></div>
       <div id="register-form" style="display:none"><div class="auth-card"><div class="auth-title">Join the void</div><div class="auth-sub">create your m.u.d misunderstood account</div><div class="form-group"><label class="form-label">full name</label><input class="form-input" type="text" id="regName" placeholder="your name"/></div><div class="form-group"><label class="form-label">email</label><input class="form-input" type="email" id="regEmail" placeholder="your@email.com"/></div><div class="form-group"><label class="form-label">password</label><input class="form-input" type="password" id="regPass" placeholder="min. 6 characters"/></div><button class="form-btn" onclick="doRegister()">create account</button><div class="form-switch">already have an account? <span onclick="showLogin()">sign in</span></div></div></div>
+      <div id="pending-confirm" style="display:none"><div class="auth-card" style="text-align:center">
+        <div style="width:48px;height:48px;margin:0 auto 20px;border-radius:50%;border:2px solid rgba(230,51,41,.25);border-top-color:#e63329;animation:spin 0.9s linear infinite"></div>
+        <div class="auth-title">check your inbox</div>
+        <div class="auth-sub" style="margin-bottom:4px">we sent a confirmation link to</div>
+        <div style="font-size:13px;color:#fff;font-weight:600;margin-bottom:18px" id="pendingEmail"></div>
+        <div class="auth-sub" style="font-size:12px;line-height:1.6">confirm on this device or any other — this page updates automatically once you're verified.</div>
+        <div class="form-switch" style="margin-top:22px"><span onclick="cancelPending()">use a different email</span></div>
+      </div></div>
       <div id="profile-view" style="display:none"><div class="profile-header"><div class="profile-avatar" id="profileInitial">C</div><div><div class="profile-name" id="profileName">User</div><div class="profile-email" id="profileEmail">user@email.com</div></div><button class="logout-btn" onclick="doLogout()">sign out</button></div><p style="font-size:13px;color:rgba(255,255,255,.4)">you're signed in. use the tabs above to view your orders or update settings.</p></div>
     </div>
     <div class="account-panel" id="tab-orders"><div id="orders-list"></div></div>
@@ -715,6 +733,133 @@ footer{padding:60px 24px 40px;border-top:1px solid rgba(255,255,255,.06);max-wid
 </div>
 
 <script>
+/* ══ CURRENCY ══ */
+const CUR_SUPPORTED = {
+  ZAR:{symbol:'R',locale:'en-ZA'},
+  USD:{symbol:'$',locale:'en-US'},
+  EUR:{symbol:'€',locale:'en-IE'},
+  GBP:{symbol:'£',locale:'en-GB'},
+  ZWL:{symbol:'US$',locale:'en-US'}, // Zimbabwe is USD-functional; treat as USD
+  ZMW:{symbol:'K',locale:'en-ZM'},
+  BWP:{symbol:'P',locale:'en-BW'},
+  NAD:{symbol:'N$',locale:'en-NA'},
+  KES:{symbol:'KSh',locale:'en-KE'},
+  NGN:{symbol:'₦',locale:'en-NG'},
+  GHS:{symbol:'GH₵',locale:'en-GH'},
+  AUD:{symbol:'A$',locale:'en-AU'},
+  CAD:{symbol:'C$',locale:'en-CA'},
+};
+// Country code -> currency code
+const COUNTRY_CURRENCY = {
+  ZA:'ZAR', ZW:'USD', ZM:'ZMW', BW:'BWP', NA:'NAD', KE:'KES', NG:'NGN', GH:'GHS',
+  US:'USD', GB:'GBP', AU:'AUD', CA:'CAD',
+  DE:'EUR',FR:'EUR',IT:'EUR',ES:'EUR',NL:'EUR',IE:'EUR',PT:'EUR',AT:'EUR',BE:'EUR',FI:'EUR',GR:'EUR'
+};
+let currentCurrency = localStorage.getItem('cs_currency') || 'ZAR';
+let fxRates = null; // { USD: 0.054, EUR: 0.050, ... } base ZAR
+
+async function initCurrency(){
+  // load cached rates (refresh every 12h)
+  try{
+    const cached = JSON.parse(localStorage.getItem('cs_fx')||'null');
+    if(cached && Date.now()-cached.ts < 12*60*60*1000){
+      fxRates = cached.rates;
+    }
+  }catch(e){}
+  if(!fxRates){
+    try{
+      const res = await fetch('https://open.er-api.com/v6/latest/ZAR');
+      const data = await res.json();
+      if(data && data.rates){
+        fxRates = data.rates;
+        localStorage.setItem('cs_fx', JSON.stringify({rates:fxRates, ts:Date.now()}));
+      }
+    }catch(e){ console.warn('FX fetch failed, defaulting to ZAR', e); }
+  }
+  // auto-detect country only if user hasn't manually chosen before
+  if(!localStorage.getItem('cs_currency')){
+    let cc = null;
+    try{
+      const res = await fetch('https://ipapi.co/json/');
+      const data = await res.json();
+      cc = data && data.country_code;
+    }catch(e){ console.warn('Primary geo-IP failed, trying fallback', e); }
+    if(!cc){
+      try{
+        const res2 = await fetch('https://ipwho.is/');
+        const data2 = await res2.json();
+        cc = data2 && data2.country_code;
+      }catch(e){ console.warn('Fallback geo-IP also failed, defaulting to ZAR', e); }
+    }
+    if(cc && COUNTRY_CURRENCY[cc]){
+      currentCurrency = COUNTRY_CURRENCY[cc];
+      localStorage.setItem('cs_currency', currentCurrency);
+    }
+  }
+  updateCurrencyLabel();
+  buildCurrencyDropdown();
+  refreshAllPrices();
+}
+
+function convertPrice(zarAmount){
+  if(currentCurrency==='ZAR' || !fxRates || !fxRates[currentCurrency]) return zarAmount;
+  return zarAmount * fxRates[currentCurrency];
+}
+
+function formatPrice(zarAmount){
+  const cfg = CUR_SUPPORTED[currentCurrency] || CUR_SUPPORTED.ZAR;
+  const converted = convertPrice(zarAmount);
+  try{
+    return new Intl.NumberFormat(cfg.locale,{style:'currency',currency:currentCurrency==='ZWL'?'USD':currentCurrency,maximumFractionDigits:0}).format(converted);
+  }catch(e){
+    return cfg.symbol+' '+Math.round(converted).toLocaleString();
+  }
+}
+
+function updateCurrencyLabel(){
+  const el = document.getElementById('currency-label');
+  if(el) el.textContent = currentCurrency;
+}
+
+function toggleCurrencyMenu(){
+  const dd = document.getElementById('currency-dropdown');
+  if(!dd) return;
+  dd.style.display = dd.style.display==='none' ? 'block' : 'none';
+}
+
+function buildCurrencyDropdown(){
+  const dd = document.getElementById('currency-dropdown');
+  if(!dd) return;
+  dd.innerHTML = Object.keys(CUR_SUPPORTED).map(code=>
+    `<div class="currency-item${code===currentCurrency?' active':''}" onclick="setCurrency('${code}')">${code}</div>`
+  ).join('');
+}
+
+function setCurrency(code){
+  currentCurrency = code;
+  localStorage.setItem('cs_currency', code);
+  updateCurrencyLabel();
+  buildCurrencyDropdown();
+  toggleCurrencyMenu();
+  refreshAllPrices();
+}
+
+function refreshAllPrices(){
+  // re-render whatever's currently on screen that shows prices
+  if(typeof buildGrids==='function') buildGrids();
+  if(typeof renderCart==='function') renderCart();
+  if(typeof renderOrders==='function') renderOrders();
+  if(typeof modalProduct!=='undefined' && modalProduct && document.getElementById('pm-price')) document.getElementById('pm-price').textContent=formatPrice(modalProduct.price);
+}
+
+document.addEventListener('click', function(e){
+  const wrap = document.getElementById('currency-wrap');
+  if(wrap && !wrap.contains(e.target)){
+    const dd = document.getElementById('currency-dropdown');
+    if(dd) dd.style.display = 'none';
+  }
+});
+
 /* ══ SUPABASE ══ */
 const SUPA_URL='https://ivwoeqbeblwvkmqkwbuk.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2d29lcWJlYmx3dmttcWt3YnVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0MDI2NTIsImV4cCI6MjA5Nzk3ODY1Mn0.I0P0_j14Db-HmagIK12yAFHiUuM1Upcj3Auvm1SeJRo';
@@ -822,7 +967,7 @@ function buildGrids(){
     const withImgs=prods.filter(p=>p.front&&p.front.length>10);
     if(!withImgs.length){grid.innerHTML='<p style="color:rgba(255,255,255,.25);padding:24px;font-size:12px;letter-spacing:.1em;text-transform:uppercase">coming soon</p>';return;}
     grid.innerHTML=withImgs.map(p=>{
-      const priceHtml=`R ${p.price.toLocaleString()}`;
+      const priceHtml=formatPrice(p.price);
       return`<div class="mini-card" onclick="openProductModal('${p.id}')">
         <div class="mini-card-visual" style="overflow:hidden;background:#d4d1cc;display:flex;align-items:center;justify-content:center">
           <img src="${p.front}" style="width:100%;height:100%;object-fit:contain;display:block" alt="${p.name}" loading="lazy"/>
@@ -844,7 +989,7 @@ function openProductModal(pid){
   document.getElementById('pm-cat').textContent='— '+p.cat;
   document.getElementById('pm-name').textContent=p.name;
   document.getElementById('pm-desc').textContent=p.desc;
-  document.getElementById('pm-price').textContent='R '+p.price.toLocaleString();
+  document.getElementById('pm-price').textContent=formatPrice(p.price);
   const frontImg=document.getElementById('pm-front-img');
   const backImg=document.getElementById('pm-back-img');
   frontImg.src=p.front||''; backImg.src=p.back||p.front||'';
@@ -939,7 +1084,7 @@ function updateCartUI(){
   const badge=document.getElementById('cartBadge');
   if(badge){badge.textContent=total;badge.classList.toggle('show',total>0);}
   const cnt=document.getElementById('cartItemCount');if(cnt)cnt.textContent=total;
-  const tot=document.getElementById('cartTotal');if(tot)tot.textContent='R '+sub.toLocaleString();
+  const tot=document.getElementById('cartTotal');if(tot)tot.textContent=formatPrice(sub);
   const el=document.getElementById('cartItems');if(!el)return;
   if(!cart.length){el.innerHTML='<div class="cart-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" width="48" height="48"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><p>your cart is empty</p></div>';return;}
   el.innerHTML=cart.map((item,idx)=>`
@@ -955,7 +1100,7 @@ function updateCartUI(){
             <span class="qty-val">${item.qty}</span>
             <button class="qty-btn" onclick="changeQty(${idx},1)">+</button>
           </div>
-          <div class="cart-item-price">R ${(item.price*item.qty).toLocaleString()}</div>
+          <div class="cart-item-price">${formatPrice(item.price*item.qty)}</div>
           <button class="cart-remove" onclick="removeItem(${idx})">×</button>
         </div>
       </div>
@@ -987,17 +1132,17 @@ function switchTab(tab){
 }
 function refreshAccountUI(){
   currentUser=sb.user();
-  const lf=document.getElementById('login-form'),rf=document.getElementById('register-form'),pv=document.getElementById('profile-view');
+  const lf=document.getElementById('login-form'),rf=document.getElementById('register-form'),pv=document.getElementById('profile-view'),pc=document.getElementById('pending-confirm');
   if(!lf)return;
-  if(currentUser){lf.style.display='none';rf.style.display='none';pv.style.display='block';
+  if(currentUser){stopPollingConfirmation();if(pc)pc.style.display='none';lf.style.display='none';rf.style.display='none';pv.style.display='block';
     const name=currentUser.user_metadata?.full_name||currentUser.email||'User';
     document.getElementById('profileName').textContent=name;
     document.getElementById('profileEmail').textContent=currentUser.email;
     document.getElementById('profileInitial').textContent=name.charAt(0).toUpperCase();
   }else{lf.style.display='block';rf.style.display='none';pv.style.display='none';}
 }
-function showRegister(){document.getElementById('login-form').style.display='none';document.getElementById('register-form').style.display='block';}
-function showLogin(){document.getElementById('register-form').style.display='none';document.getElementById('login-form').style.display='block';}
+function showRegister(){stopPollingConfirmation();document.getElementById('pending-confirm').style.display='none';document.getElementById('login-form').style.display='none';document.getElementById('register-form').style.display='block';}
+function showLogin(){stopPollingConfirmation();document.getElementById('pending-confirm').style.display='none';document.getElementById('register-form').style.display='none';document.getElementById('login-form').style.display='block';}
 function togglePassVis(id,btn){
   const inp=document.getElementById(id);const show=inp.type==='password';inp.type=show?'text':'password';
   btn.innerHTML=show?'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17.94 17.94A10 10 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>':'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
@@ -1009,6 +1154,7 @@ async function doLogin(){
   if(res.error||!res.access_token){showToast(res.error_description||'incorrect credentials','error');return;}
   localStorage.setItem('cs_sb',JSON.stringify(res));currentUser=res.user;showToast('welcome back!','success');refreshAccountUI();
 }
+let pendingPoll=null;
 async function doRegister(){
   const name=document.getElementById('regName').value.trim(),email=document.getElementById('regEmail').value.trim(),pass=document.getElementById('regPass').value;
   if(!name||!email||!pass){showToast('fill in all fields','error');return;}
@@ -1016,7 +1162,41 @@ async function doRegister(){
   const res=await sb.signUp(email,pass,name);
   if(res.error){showToast(res.error?.message||'registration failed','error');return;}
   if(res.access_token){localStorage.setItem('cs_sb',JSON.stringify(res));currentUser=res.user;showToast('welcome '+name+'!','success');refreshAccountUI();}
-  else showToast('check your email to confirm your account','success');
+  else{
+    showToast('check your email to confirm your account','success');
+    showPending(email,pass);
+  }
+}
+function showPending(email,pass){
+  document.getElementById('register-form').style.display='none';
+  document.getElementById('login-form').style.display='none';
+  document.getElementById('pending-confirm').style.display='block';
+  document.getElementById('pendingEmail').textContent=email;
+  startPollingConfirmation(email,pass);
+}
+function cancelPending(){
+  stopPollingConfirmation();
+  document.getElementById('pending-confirm').style.display='none';
+  showRegister();
+}
+function startPollingConfirmation(email,pass){
+  stopPollingConfirmation();
+  pendingPoll=setInterval(async()=>{
+    try{
+      const res=await sb.signIn(email,pass);
+      if(res.access_token){
+        stopPollingConfirmation();
+        localStorage.setItem('cs_sb',JSON.stringify(res));
+        currentUser=res.user;
+        document.getElementById('pending-confirm').style.display='none';
+        showToast('email confirmed — welcome!','success');
+        refreshAccountUI();
+      }
+    }catch(e){/* not confirmed yet, keep polling */}
+  },4000);
+}
+function stopPollingConfirmation(){
+  if(pendingPoll){clearInterval(pendingPoll);pendingPoll=null;}
 }
 function doLogout(){sb.signOut();cart=[];localStorage.removeItem('mud_cart');updateCartUI();refreshAccountUI();showToast('signed out','success');}
 async function renderOrders(){
@@ -1028,7 +1208,7 @@ async function renderOrders(){
     el.innerHTML=orders.map(o=>{
       const sc=o.status==='delivered'?'status-delivered':o.status==='shipped'?'status-shipped':'status-processing';
       const date=new Date(o.created_at).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});
-      return`<div class="order-card"><div class="order-top"><span class="order-id">${o.id}</span><span class="order-date">${date}</span><span class="order-status ${sc}">${o.status}</span></div><div class="order-total">total: <span>R ${(o.total||0).toLocaleString()}</span></div><button class="track-btn" onclick="openTrack('${o.id}','${o.status}')">track order →</button></div>`;
+      return`<div class="order-card"><div class="order-top"><span class="order-id">${o.id}</span><span class="order-date">${date}</span><span class="order-status ${sc}">${o.status}</span></div><div class="order-total">total: <span>${formatPrice(o.total||0)}</span></div><button class="track-btn" onclick="openTrack('${o.id}','${o.status}')">track order →</button></div>`;
     }).join('');
   }catch(e){el.innerHTML='<p style="color:rgba(255,255,255,.35)">could not load orders.</p>';}
 }
@@ -1145,7 +1325,7 @@ function doSearch(q){
   const hits=query?all.filter(p=>p.name.toLowerCase().includes(query)||p.cat.toLowerCase().includes(query)||p.desc.toLowerCase().includes(query)):all.slice(0,8);
   if(!hits.length){res.innerHTML='<div class="sr-empty">no results for &ldquo;'+q+'&rdquo;</div>';return;}
   const lbl=query?hits.length+' result'+(hits.length===1?'':'s'):'browse all';
-  res.innerHTML='<div class="sr-label">'+lbl+'</div>'+hits.map(p=>'<div class="sr-item" onclick="closeSearch();openProductModal(&quot;'+p.id+'&quot;)"><img class="sr-img" src="'+p.front+'" alt=""/><div style="flex:1;min-width:0"><div class="sr-name">'+p.name+'</div><div class="sr-cat">'+p.cat+'</div></div><div class="sr-price">R '+p.price.toLocaleString()+'</div></div>').join('');
+  res.innerHTML='<div class="sr-label">'+lbl+'</div>'+hits.map(p=>'<div class="sr-item" onclick="closeSearch();openProductModal(&quot;'+p.id+'&quot;)"><img class="sr-img" src="'+p.front+'" alt=""/><div style="flex:1;min-width:0"><div class="sr-name">'+p.name+'</div><div class="sr-cat">'+p.cat+'</div></div><div class="sr-price">'+formatPrice(p.price)+'</div></div>').join('');
 }
 document.addEventListener('click',e=>{const w=document.getElementById('search-wrap');if(_sOpen&&w&&!w.contains(e.target))closeSearch();});
 
@@ -1255,6 +1435,7 @@ if(typeof PRODUCTS !== 'undefined'){
     if(imgs){p.front=imgs.f||'';p.back=imgs.b||imgs.f||'';}
   });
   buildGrids();
+  initCurrency();
   // Also update search results with patched products
   if(typeof doSearch==='function') doSearch('');
 }
