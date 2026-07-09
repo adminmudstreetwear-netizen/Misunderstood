@@ -933,54 +933,10 @@ const sb={
 };
 
 /* ══ PRODUCTS ══ */
-const PRODUCTS = [
-  {id:'mud-thorn-tee-white',name:'Thorn Circle Tee — White',cat:'tees',price:300,desc:'MUD chest logo front. Thorn crown circle back. 240gsm.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-arch-tee-cream',name:'MISUNDERSTOOD Arch Tee — Cream',cat:'tees',price:300,desc:'mis/under/stood. chest logo. MISUNDERSTOOD arch back. EST. 2022.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-drip-tee-charcoal',name:'Drip Tee — Charcoal',cat:'tees',price:300,desc:'Gothic MUD drip graphic. 240gsm washed cotton. Oversized.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-mis2-tee-black',name:'(mis/stood)2 Tee — Black',cat:'tees',price:300,desc:'Mathematical misunderstood graphic. Woven label. 240gsm.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-street-tee-black',name:'MUD Street Wear Tee — Black',cat:'tees',price:300,desc:'MUD Street Wear chest logo. Oversized boxy fit. 240gsm.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-tshirt-1',name:'misunderstood. Tee — Black',cat:'tees',price:300,desc:'misunderstood. chest logo front. Vertical back. 240gsm.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-tshirt-2',name:'Not For Everyone Tee — Cream',cat:'tees',price:300,desc:'NOT FOR EVERYONE. BUILT FOR REAL ONES. EST.2022 front.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-tshirt-3',name:'mis/under/stood. Block Tee — Black',cat:'tees',price:300,desc:'mis/under/stood. STREETWEAR block front. Bold M back.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-tshirt-4',name:'MISUNDERSTOOD Street Wear Tee — Cream',cat:'tees',price:300,desc:'MISUNDERSTOOD STREET WEAR front. Brush stroke back.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-tshirt-5',name:'mis/under/stood. Chest Tee — Black',cat:'tees',price:300,desc:'mis/under/stood. small chest logo. JUDGED BY FEW back.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-tshirt-6',name:'MISUNDERSTOOD Streetwear Tee — Black',cat:'tees',price:300,desc:'MISUNDERSTOOD STREETWEAR front. Globe misunderstood. back.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-tshirt-7',name:'MISUNDERSTOOD Arch Tee — Black',cat:'tees',price:300,desc:'MISUNDERSTOOD arch back print. 240gsm oversized.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-tshirt-8',name:'mis/under/stood. Tee — Cream',cat:'tees',price:300,desc:'mis/under/stood. chest logo front. Barcode MISUNDERSTOOD back.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-coach-jacket',name:'MUD Coach Jacket',cat:'tees',price:350,desc:'MUD coach jacket. Logo patch front. Large mud. back graphic.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-eyes-crewneck',name:'Eyes Crewneck — Black',cat:'hoodies',price:350,desc:'320gsm crewneck. Eyes photo print front. Splatter back.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-crewneck-cream',name:'MUD Crewneck — Cream',cat:'hoodies',price:350,desc:'Large MUD back print. Crew neck. 320gsm. EST. 2024.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-sun-hoodie-black',name:'Sun Graphic Hoodie — Black',cat:'hoodies',price:450,desc:'380gsm fleece. Exploding sun graphic front. Oversized.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-logo-hoodie-cream',name:'Logo Hoodie — Cream',cat:'hoodies',price:450,desc:'380gsm fleece. misunderstood. large back. MUD chest logo.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-hoodie-1',name:'MUD Block Wordmark Hoodie — Cream',cat:'hoodies',price:450,desc:'Cream hoodie. Front and back design. 380gsm fleece.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-hoodie-2',name:'Distressed MISUNDERSTOOD Hoodie — Cream',cat:'hoodies',price:450,desc:'Cream hoodie. Front and back design. 380gsm fleece.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-hoodie-3',name:'Thorn Circle Chest Hoodie — Cream',cat:'hoodies',price:450,desc:'Cream hoodie. Front and back design. 380gsm fleece.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-hoodie-4',name:'Varsity Block Hoodie — Cream',cat:'hoodies',price:450,desc:'Cream hoodie. Front and back design. 380gsm fleece.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-hoodie-5',name:'MISUNDERSTOOD Hoodie — Cream',cat:'hoodies',price:450,desc:'MISUNDERSTOOD STREETWEAR EST. 2022. Large back print.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-hoodie-6',name:'mis/under/stood. Hoodie — Cream',cat:'hoodies',price:450,desc:'mis/under/stood. STREETWEAR chest logo. Large back print.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-hoodie-7',name:'M Graphic Hoodie — Cream',cat:'hoodies',price:450,desc:'Bold M drip graphic. misunderstood. JUDGED BY FEW back.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-sp-goth-star-blk',name:'Gothic MUD Star Sweatpants — Black',cat:'bottoms',price:450,desc:'Gothic MUD waist. misunderstood. star print. 380gsm.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-sp-goth-script-blk',name:'Gothic MUD Script Leg Sweatpants — Black',cat:'bottoms',price:450,desc:'Gothic MUD waist. Vertical gothic script leg.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-sp-goth-stars-blk',name:'Gothic MUD Scattered Stars Sweatpants — Black',cat:'bottoms',price:450,desc:'Gothic MUD waist. Scattered star cluster prints.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-sp-goth-cream',name:'Gothic MUD Outline Sweatpants — Cream',cat:'bottoms',price:450,desc:'Gothic MUD outline. Star misunderstood. vertical leg. Cream.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-sp-flame-washed',name:'Flame Graphic Sweatpants — Washed',cat:'bottoms',price:450,desc:'Gothic MUD waist. Flame graphic on leg. Vintage washed.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-sp-drip-washed',name:'Drip MUD Sweatpants — Washed',cat:'bottoms',price:450,desc:'Drip MUD waist. misunderstood. vertical leg. Washed dark.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-sp-goth-cln-wshd',name:'Gothic MUD Clean Sweatpants — Washed',cat:'bottoms',price:450,desc:'Gothic MUD waist. Star ankle only. Washed charcoal.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-sp-goth-mis-wshd',name:'Gothic MUD Misunderstood Sweatpants — Washed',cat:'bottoms',price:450,desc:'Gothic MUD waist. misunderstood. star leg. Washed.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-sp-goth-blk-2',name:'Gothic MUD Sweatpants — Black II',cat:'bottoms',price:450,desc:'Gothic MUD waist. misunderstood. star. Pure black.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-sp-goth-dots-blk',name:'Gothic MUD Dots Stars Sweatpants — Black',cat:'bottoms',price:450,desc:'Gothic MUD dots waist. Multiple star prints. Pure black.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-sp-goth-str2-wshd',name:'Gothic MUD Star Sweatpants — Washed',cat:'bottoms',price:450,desc:'Gothic MUD waist. misunderstood. star ankle. Washed.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-sp-bold-black',name:'MISUNDERSTOOD Bold Leg Sweatpants — Black',cat:'bottoms',price:450,desc:'MISUNDERSTOOD bold vertical leg print. Classic fit. Black.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-sp-goth-ankl-wshd',name:'Gothic MUD Ankle Star Sweatpants — Washed',cat:'bottoms',price:450,desc:'Gothic MUD waist. Large star ankle. MISUNDERSTOOD text.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-street-shorts-blk',name:'MUD Street Wear Shorts — Black',cat:'bottoms',price:450,desc:'MUD Street Wear logo shorts. Fleece. Side pockets.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-black-tracksuit',name:'MUD. Black Windbreaker Tracksuit',cat:'tracksuits',price:750,desc:'MUD. windbreaker jacket and pants. White piping.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-white-tracksuit',name:'MISUNDERSTOOD White Windbreaker Tracksuit',cat:'tracksuits',price:750,desc:'MISUNDERSTOOD arch back. White windbreaker and pants.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-black-ts-jacket',name:'MUD. Windbreaker Jacket — Black',cat:'tracksuits',price:750,desc:'MUD. chest logo. MISUNDERSTOOD STREET WEAR back.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''},
-  {id:'mud-white-ts-jacket',name:'MISUNDERSTOOD Windbreaker Jacket — White',cat:'tracksuits',price:750,desc:'MISUNDERSTOOD arch back. White windbreaker only.',sizes:['XS', 'S', 'M', 'L', 'XL'],soldOut:[],front:'',back:''}
-];
+let PRODUCTS = [];
 
-const CAT_MAP = {};
-PRODUCTS.forEach(p=>{ (CAT_MAP[p.cat]=CAT_MAP[p.cat]||[]).push(p); });
+let CAT_MAP = {};
+function rebuildCatMap(){ CAT_MAP={}; PRODUCTS.forEach(p=>{ (CAT_MAP[p.cat]=CAT_MAP[p.cat]||[]).push(p); }); }
 
 let currentUser = null;
 let cart = JSON.parse(localStorage.getItem('mud_cart')||'[]');
@@ -1006,6 +962,7 @@ function catShape(cat){
 /* ══ BUILD GRIDS ══ */
 
 function buildGrids(){
+  rebuildCatMap();
   const countMap={};
   PRODUCTS.forEach(p=>{ countMap[p.cat]=(countMap[p.cat]||0)+1; });
   document.querySelectorAll('.cat-count').forEach(el=>{
@@ -1519,64 +1476,33 @@ refreshAccountUI();
   inp.parentElement.appendChild(btn);
 });
 </script>
-<script>/* MUD IMAGE DATA */
-const MUD_IMGS={
-'mud-thorn-tee-white':{f:'images/mud-thorn-tee-white-front.jpg',b:'images/mud-thorn-tee-white-back.jpg'},
-'mud-arch-tee-cream':{f:'images/mud-arch-tee-cream-front.jpg',b:'images/mud-arch-tee-cream-back.jpg'},
-'mud-drip-tee-charcoal':{f:'images/mud-drip-tee-charcoal-front.jpg',b:'images/mud-drip-tee-charcoal-back.jpg'},
-'mud-mis2-tee-black':{f:'images/mud-mis2-tee-black-front.jpg',b:'images/mud-mis2-tee-black-back.jpg'},
-'mud-street-tee-black':{f:'images/mud-street-tee-black-front.jpg',b:'images/mud-street-tee-black-back.jpg'},
-'mud-tshirt-1':{f:'images/mud-tshirt-1-front.jpg',b:'images/mud-tshirt-1-back.jpg'},
-'mud-tshirt-2':{f:'images/mud-tshirt-2-front.jpg',b:'images/mud-tshirt-2-back.jpg'},
-'mud-tshirt-3':{f:'images/mud-tshirt-3-front.jpg',b:'images/mud-tshirt-3-back.jpg'},
-'mud-tshirt-4':{f:'images/mud-tshirt-4-front.jpg',b:'images/mud-tshirt-4-back.jpg'},
-'mud-tshirt-5':{f:'images/mud-tshirt-5-front.jpg',b:'images/mud-tshirt-5-back.jpg'},
-'mud-tshirt-6':{f:'images/mud-tshirt-6-front.jpg',b:'images/mud-tshirt-6-back.jpg'},
-'mud-tshirt-7':{f:'images/mud-tshirt-7-front.jpg',b:'images/mud-tshirt-7-back.jpg'},
-'mud-tshirt-8':{f:'images/mud-tshirt-8-front.jpg',b:'images/mud-tshirt-8-back.jpg'},
-'mud-coach-jacket':{f:'images/mud-coach-jacket-front.jpg',b:'images/mud-coach-jacket-back.jpg'},
-'mud-eyes-crewneck':{f:'images/mud-eyes-crewneck-front.jpg',b:'images/mud-eyes-crewneck-back.jpg'},
-'mud-crewneck-cream':{f:'images/mud-crewneck-cream-front.jpg',b:'images/mud-crewneck-cream-back.jpg'},
-'mud-sun-hoodie-black':{f:'images/mud-sun-hoodie-black-front.jpg',b:'images/mud-sun-hoodie-black-back.jpg'},
-'mud-logo-hoodie-cream':{f:'images/mud-logo-hoodie-cream-front.jpg',b:'images/mud-logo-hoodie-cream-back.jpg'},
-'mud-hoodie-1':{f:'images/mud-hoodie-1-front.jpg',b:'images/mud-hoodie-1-back.jpg'},
-'mud-hoodie-2':{f:'images/mud-hoodie-2-front.jpg',b:'images/mud-hoodie-2-back.jpg'},
-'mud-hoodie-3':{f:'images/mud-hoodie-3-front.jpg',b:'images/mud-hoodie-3-back.jpg'},
-'mud-hoodie-4':{f:'images/mud-hoodie-4-front.jpg',b:'images/mud-hoodie-4-back.jpg'},
-'mud-hoodie-5':{f:'images/mud-hoodie-5-front.jpg',b:'images/mud-hoodie-5-back.jpg'},
-'mud-hoodie-6':{f:'images/mud-hoodie-6-front.jpg',b:'images/mud-hoodie-6-back.jpg'},
-'mud-hoodie-7':{f:'images/mud-hoodie-7-front.jpg',b:'images/mud-hoodie-7-back.jpg'},
-'mud-sp-goth-star-blk':{f:'images/mud-sp-goth-star-blk-front.jpg',b:'images/mud-sp-goth-star-blk-back.jpg'},
-'mud-sp-goth-script-blk':{f:'images/mud-sp-goth-script-blk-front.jpg',b:'images/mud-sp-goth-script-blk-back.jpg'},
-'mud-sp-goth-stars-blk':{f:'images/mud-sp-goth-stars-blk-front.jpg',b:'images/mud-sp-goth-stars-blk-back.jpg'},
-'mud-sp-goth-cream':{f:'images/mud-sp-goth-cream-front.jpg',b:'images/mud-sp-goth-cream-back.jpg'},
-'mud-sp-flame-washed':{f:'images/mud-sp-flame-washed-front.jpg',b:'images/mud-sp-flame-washed-back.jpg'},
-'mud-sp-drip-washed':{f:'images/mud-sp-drip-washed-front.jpg',b:'images/mud-sp-drip-washed-back.jpg'},
-'mud-sp-goth-cln-wshd':{f:'images/mud-sp-goth-cln-wshd-front.jpg',b:'images/mud-sp-goth-cln-wshd-back.jpg'},
-'mud-sp-goth-mis-wshd':{f:'images/mud-sp-goth-mis-wshd-front.jpg',b:'images/mud-sp-goth-mis-wshd-back.jpg'},
-'mud-sp-goth-blk-2':{f:'images/mud-sp-goth-blk-2-front.jpg',b:'images/mud-sp-goth-blk-2-back.jpg'},
-'mud-sp-goth-dots-blk':{f:'images/mud-sp-goth-dots-blk-front.jpg',b:'images/mud-sp-goth-dots-blk-back.jpg'},
-'mud-sp-goth-str2-wshd':{f:'images/mud-sp-goth-str2-wshd-front.jpg',b:'images/mud-sp-goth-str2-wshd-back.jpg'},
-'mud-sp-bold-black':{f:'images/mud-sp-bold-black-front.jpg',b:'images/mud-sp-bold-black-back.jpg'},
-'mud-sp-goth-ankl-wshd':{f:'images/mud-sp-goth-ankl-wshd-front.jpg',b:'images/mud-sp-goth-ankl-wshd-back.jpg'},
-'mud-street-shorts-blk':{f:'images/mud-street-shorts-blk-front.jpg',b:'images/mud-street-shorts-blk-back.jpg'},
-'mud-black-tracksuit':{f:'images/mud-black-tracksuit-front.jpg',b:'images/mud-black-tracksuit-back.jpg'},
-'mud-white-tracksuit':{f:'images/mud-white-tracksuit-front.jpg',b:'images/mud-white-tracksuit-back.jpg'},
-'mud-black-ts-jacket':{f:'images/mud-black-ts-jacket-front.jpg',b:'images/mud-black-ts-jacket-back.jpg'},
-'mud-white-ts-jacket':{f:'images/mud-white-ts-jacket-front.jpg',b:'images/mud-white-ts-jacket-back.jpg'}
-};
-// Patch products then build grids — this script runs after main script
-if(typeof PRODUCTS !== 'undefined'){
-  PRODUCTS.forEach(function(p){
-    var imgs=MUD_IMGS[p.id];
-    if(imgs){p.front=imgs.f||'';p.back=imgs.b||imgs.f||'';}
-  });
-  buildGrids();
-  Promise.all([loadCurrencyData(), loadLiveStockData()]).then(()=>{
+<script>
+async function loadProductsFromSupabase(){
+  try{
+    const rows = await sb.get('products','?select=id,name,category,price,description,sizes,sold_out_sizes,in_stock,image_front,image_back');
+    if(!Array.isArray(rows)) return;
+    PRODUCTS = rows
+      .filter(r => r.image_front) // skip products that don't have images uploaded yet
+      .map(r => ({
+        id: r.id,
+        name: r.name,
+        cat: r.category,
+        price: r.price,
+        desc: r.description || '',
+        sizes: r.sizes || [],
+        soldOut: r.sold_out_sizes || [],
+        discontinued: r.in_stock === false,
+        front: r.image_front || '',
+        back: r.image_back || r.image_front || ''
+      }));
+  }catch(e){ console.error('Failed to load products from Supabase', e); }
+}
+
+if(typeof buildGrids !== 'undefined'){
+  Promise.all([loadProductsFromSupabase(), loadCurrencyData()]).then(()=>{
     buildGrids();
+    if(typeof doSearch==='function') doSearch('');
   });
-  // Also update search results with patched products
-  if(typeof doSearch==='function') doSearch('');
 }
 </script>
 </body>
