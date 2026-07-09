@@ -594,7 +594,7 @@ footer{padding:60px 24px 40px;border-top:1px solid rgba(255,255,255,.06);max-wid
     <div><div class="footer-brand">M.U.D<br/>Misunderstood</div><div class="footer-tag">not defined. not explained. just different. centurion, south africa.</div></div>
     <div><div class="footer-col-title">shop</div><ul class="footer-links"><li><a onclick="scrollToSection('drops')">new arrivals</a></li><li><a onclick="openPanel('hoodies',400,400)">hoodies</a></li><li><a onclick="openPanel('tees',400,400)">tees</a></li><li><a onclick="openPanel('bottoms',400,400)">bottoms</a></li><li><a onclick="openPanel('sneakers',400,400)">sneakers</a></li><li><a onclick="openPanel('tracksuits',400,400)">tracksuits</a></li></ul></div>
     <div><div class="footer-col-title">info</div><ul class="footer-links"><li><a onclick="scrollToSection('story')">about us</a></li><li><a onclick="openLegal('sizing')">sizing guide</a></li><li><a onclick="openLegal('shipping')">shipping</a></li><li><a onclick="openLegal('returns')">returns</a></li></ul></div>
-    <div><div class="footer-col-title">connect</div><ul class="footer-links"><li><a>instagram</a></li><li><a>tiktok</a></li><li><a>twitter / x</a></li><li><a onclick="openAccount()">my account</a></li></ul></div>
+    <div><div class="footer-col-title">connect</div><ul class="footer-links"><li><a href="https://www.instagram.com/the_mud_street.wear" target="_blank" rel="noopener">instagram</a></li><li><a onclick="openLegal('contact')">contact us</a></li><li><a onclick="openAccount()">my account</a></li></ul></div>
   </div>
   <div class="footer-bottom"><span>© 2026 m.u.d misunderstood. all rights reserved.</span><span><a onclick="openLegal('privacy')" style="cursor:pointer;color:inherit;text-decoration:underline">privacy</a> · <a onclick="openLegal('terms')" style="cursor:pointer;color:inherit;text-decoration:underline">terms</a></span></div>
 </footer>
@@ -785,7 +785,7 @@ const COUNTRY_CURRENCY = {
 let currentCurrency = localStorage.getItem('cs_currency') || 'ZAR';
 let fxRates = null; // { USD: 0.054, EUR: 0.050, ... } base ZAR
 
-async function syncLiveStock(){
+async function loadLiveStockData(){
   try{
     const live = await sb.get('products','?select=id,sold_out_sizes,in_stock');
     if(!Array.isArray(live)) return;
@@ -798,11 +798,15 @@ async function syncLiveStock(){
         p.discontinued = row.in_stock === false;
       }
     });
-    if(typeof buildGrids==='function') buildGrids();
   }catch(e){ console.warn('Live stock sync failed, using bundled defaults', e); }
 }
 
-async function initCurrency(){
+async function syncLiveStock(){
+  await loadLiveStockData();
+  if(typeof buildGrids==='function') buildGrids();
+}
+
+async function loadCurrencyData(){
   // load cached rates (refresh every 12h)
   try{
     const cached = JSON.parse(localStorage.getItem('cs_fx')||'null');
@@ -810,38 +814,47 @@ async function initCurrency(){
       fxRates = cached.rates;
     }
   }catch(e){}
-  if(!fxRates){
-    try{
-      const res = await fetch('https://open.er-api.com/v6/latest/ZAR');
-      const data = await res.json();
-      if(data && data.rates){
-        fxRates = data.rates;
-        localStorage.setItem('cs_fx', JSON.stringify({rates:fxRates, ts:Date.now()}));
-      }
-    }catch(e){ console.warn('FX fetch failed, defaulting to ZAR', e); }
+
+  const needsFx = !fxRates;
+  const needsGeo = !localStorage.getItem('cs_currency');
+
+  // Run FX rates + geo-IP lookups in PARALLEL instead of one after another
+  const [fxResult, geoResult] = await Promise.allSettled([
+    needsFx ? fetch('https://open.er-api.com/v6/latest/ZAR').then(r=>r.json()) : Promise.resolve(null),
+    needsGeo ? fetchGeoCountry() : Promise.resolve(null)
+  ]);
+
+  if(needsFx && fxResult.status==='fulfilled' && fxResult.value && fxResult.value.rates){
+    fxRates = fxResult.value.rates;
+    localStorage.setItem('cs_fx', JSON.stringify({rates:fxRates, ts:Date.now()}));
   }
-  // auto-detect country only if user hasn't manually chosen before
-  if(!localStorage.getItem('cs_currency')){
-    let cc = null;
-    try{
-      const res = await fetch('https://ipapi.co/json/');
-      const data = await res.json();
-      cc = data && data.country_code;
-    }catch(e){ console.warn('Primary geo-IP failed, trying fallback', e); }
-    if(!cc){
-      try{
-        const res2 = await fetch('https://ipwho.is/');
-        const data2 = await res2.json();
-        cc = data2 && data2.country_code;
-      }catch(e){ console.warn('Fallback geo-IP also failed, defaulting to ZAR', e); }
-    }
-    if(cc && COUNTRY_CURRENCY[cc]){
-      currentCurrency = COUNTRY_CURRENCY[cc];
-      localStorage.setItem('cs_currency', currentCurrency);
-    }
+  if(needsFx && fxResult.status==='rejected'){
+    console.warn('FX fetch failed, defaulting to ZAR', fxResult.reason);
   }
+
+  if(needsGeo && geoResult.status==='fulfilled' && geoResult.value && COUNTRY_CURRENCY[geoResult.value]){
+    currentCurrency = COUNTRY_CURRENCY[geoResult.value];
+    localStorage.setItem('cs_currency', currentCurrency);
+  }
+
   updateCurrencyLabel();
   buildCurrencyDropdown();
+}
+
+async function fetchGeoCountry(){
+  try{
+    const data = await fetch('https://ipapi.co/json/').then(r=>r.json());
+    if(data && data.country_code) return data.country_code;
+  }catch(e){ console.warn('Primary geo-IP failed, trying fallback', e); }
+  try{
+    const data2 = await fetch('https://ipwho.is/').then(r=>r.json());
+    if(data2 && data2.country_code) return data2.country_code;
+  }catch(e){ console.warn('Fallback geo-IP also failed, defaulting to ZAR', e); }
+  return null;
+}
+
+async function initCurrency(){
+  await loadCurrencyData();
   refreshAllPrices();
 }
 
@@ -1308,6 +1321,36 @@ function scrollToSection(id){closePanel();closeAccount();closeModal();setTimeout
 
 /* ══ LEGAL / INFO CONTENT ══ */
 const LEGAL_CONTENT = {
+  contact: `<h2 style="color:#fff;text-transform:uppercase;font-weight:700;margin-bottom:20px">Contact Us</h2>
+    <p style="margin-bottom:24px">Reach out however's easiest — we usually respond fastest on WhatsApp.</p>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <a href="mailto:admin@mudstreetwear.co.za" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;text-decoration:none;color:inherit;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(230,51,41,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)'">
+        <span style="font-size:18px">✉️</span>
+        <div><div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4)">Email</div><div style="color:#fff;font-size:13px;margin-top:2px">admin@mudstreetwear.co.za</div></div>
+      </a>
+
+      <div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:8px">South Africa</div>
+      <a href="tel:+27614134104" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;text-decoration:none;color:inherit;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(230,51,41,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)'">
+        <span style="font-size:18px">📞</span>
+        <div><div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4)">Call</div><div style="color:#fff;font-size:13px;margin-top:2px">+27 61 413 4104</div></div>
+      </a>
+      <a href="https://wa.me/27614134104" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;text-decoration:none;color:inherit;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(230,51,41,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)'">
+        <span style="font-size:18px">💬</span>
+        <div><div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4)">WhatsApp</div><div style="color:#fff;font-size:13px;margin-top:2px">+27 61 413 4104</div></div>
+      </a>
+
+      <div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:8px">Zimbabwe</div>
+      <a href="tel:+263782233698" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;text-decoration:none;color:inherit;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(230,51,41,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)'">
+        <span style="font-size:18px">📞</span>
+        <div><div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4)">Call</div><div style="color:#fff;font-size:13px;margin-top:2px">+263 78 223 3698</div></div>
+      </a>
+      <a href="https://wa.me/263782233698" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;text-decoration:none;color:inherit;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(230,51,41,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)'">
+        <span style="font-size:18px">💬</span>
+        <div><div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4)">WhatsApp</div><div style="color:#fff;font-size:13px;margin-top:2px">+263 78 223 3698</div></div>
+      </a>
+    </div>`,
+
   sizing: `<h2 style="color:#fff;text-transform:uppercase;font-weight:700;margin-bottom:20px">Sizing Guide</h2>
     <p>All M.U.D Misunderstood pieces are true-to-size unless noted as oversized in the product description. If you're between sizes, we recommend sizing up.</p>
     <table style="width:100%;margin-top:16px;border-collapse:collapse">
@@ -1529,8 +1572,9 @@ if(typeof PRODUCTS !== 'undefined'){
     if(imgs){p.front=imgs.f||'';p.back=imgs.b||imgs.f||'';}
   });
   buildGrids();
-  initCurrency();
-  syncLiveStock();
+  Promise.all([loadCurrencyData(), loadLiveStockData()]).then(()=>{
+    buildGrids();
+  });
   // Also update search results with patched products
   if(typeof doSearch==='function') doSearch('');
 }
