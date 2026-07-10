@@ -61,7 +61,7 @@ body{font-family:'Readex Pro',system-ui,sans-serif;background:#060606;color:#fff
 #cur{position:fixed;width:10px;height:10px;background:#e63329;border-radius:50%;pointer-events:none;z-index:9999;left:-20px;top:-20px;transform:translate(-50%,-50%);transition:width .25s,height .25s}
 #cur-ring{position:fixed;width:38px;height:38px;border:1.5px solid rgba(230,51,41,.55);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s}
 @media(max-width:900px){#cur,#cur-ring{display:none}}
-#navbar{position:fixed;top:0;left:0;right:0;z-index:200;padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between;gap:16px;transition:padding .4s}
+#navbar{position:fixed;top:0;left:0;right:0;z-index:950;padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between;gap:16px;transition:padding .4s}
 #navbar.scrolled{padding:12px 24px 0}
 .pill{background:rgba(8,8,8,.88);backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,.08);border-radius:999px}
 .nav-left{display:flex;align-items:center;gap:10px;padding:10px 20px 10px 14px;cursor:pointer}
@@ -744,7 +744,10 @@ footer{padding:60px 24px 40px;border-top:1px solid rgba(255,255,255,.06);max-wid
       <button class="account-tab" onclick="switchTab('settings')">Settings</button>
     </div>
     <div class="account-panel active" id="tab-login">
-      <div id="login-form"><div class="auth-card"><div class="auth-title">Welcome back</div><div class="auth-sub">sign in to your m.u.d misunderstood account</div><div class="form-group"><label class="form-label">email</label><input class="form-input" type="email" id="loginEmail" placeholder="your@email.com"/></div><div class="form-group"><label class="form-label">password</label><input class="form-input" type="password" id="loginPass" placeholder="••••••••"/></div><button class="form-btn" onclick="doLogin()">sign in</button><div class="form-switch">don't have an account? <span onclick="showRegister()">create one</span></div></div></div>
+      <div id="login-form"><div class="auth-card"><div class="auth-title">Welcome back</div><div class="auth-sub">sign in to your m.u.d misunderstood account</div><div class="form-group"><label class="form-label">email</label><input class="form-input" type="email" id="loginEmail" placeholder="your@email.com"/></div><div class="form-group"><label class="form-label">password</label><input class="form-input" type="password" id="loginPass" placeholder="••••••••"/></div><div style="text-align:right;margin:-8px 0 20px"><span onclick="showForgotPassword()" style="font-size:11px;color:rgba(255,255,255,.45);cursor:pointer;text-decoration:underline">forgot password?</span></div><button class="form-btn" onclick="doLogin()">sign in</button><div class="form-switch">don't have an account? <span onclick="showRegister()">create one</span></div></div></div>
+      <div id="forgot-form" style="display:none"><div class="auth-card"><div class="auth-title">Reset password</div><div class="auth-sub">enter your email and we'll send you a reset link</div><div class="form-group"><label class="form-label">email</label><input class="form-input" type="email" id="forgotEmail" placeholder="your@email.com"/></div><button class="form-btn" onclick="doForgotPassword()">send reset link</button><div class="form-switch"><span onclick="showLogin()">back to sign in</span></div></div></div>
+      <div id="forgot-sent" style="display:none"><div class="auth-card" style="text-align:center"><div class="auth-title">check your inbox</div><div class="auth-sub" style="margin-bottom:4px">we sent a password reset link to</div><div style="font-size:13px;color:#fff;font-weight:600;margin-bottom:18px" id="forgotSentEmail"></div><div class="auth-sub" style="font-size:12px;line-height:1.6">click the link in that email to set a new password.</div><div class="form-switch" style="margin-top:22px"><span onclick="showLogin()">back to sign in</span></div></div></div>
+      <div id="new-password-form" style="display:none"><div class="auth-card"><div class="auth-title">Set new password</div><div class="auth-sub">choose a new password for your account</div><div class="form-group"><label class="form-label">new password</label><input class="form-input" type="password" id="newPass" placeholder="min. 6 characters"/></div><button class="form-btn" onclick="doSetNewPassword()">update password</button></div></div>
       <div id="register-form" style="display:none"><div class="auth-card"><div class="auth-title">Join the void</div><div class="auth-sub">create your m.u.d misunderstood account</div><div class="form-group"><label class="form-label">full name</label><input class="form-input" type="text" id="regName" placeholder="your name"/></div><div class="form-group"><label class="form-label">email</label><input class="form-input" type="email" id="regEmail" placeholder="your@email.com"/></div><div class="form-group"><label class="form-label">password</label><input class="form-input" type="password" id="regPass" placeholder="min. 6 characters"/></div><button class="form-btn" onclick="doRegister()">create account</button><div class="form-switch">already have an account? <span onclick="showLogin()">sign in</span></div></div></div>
       <div id="pending-confirm" style="display:none"><div class="auth-card" style="text-align:center">
         <div style="width:48px;height:48px;margin:0 auto 20px;border-radius:50%;border:2px solid rgba(230,51,41,.25);border-top-color:#e63329;animation:spin 0.9s linear infinite"></div>
@@ -941,6 +944,8 @@ const sb={
   signUp:(e,p,n)=>fetch(`${SUPA_URL}/auth/v1/signup`,{method:'POST',headers:sb.h(),body:JSON.stringify({email:e,password:p,data:{full_name:n}})}).then(r=>r.json()),
   signOut:()=>{localStorage.removeItem('cs_sb');currentUser=null;},
   user:()=>{const s=JSON.parse(localStorage.getItem('cs_sb')||'null');return s?.user||null;},
+  recover:(e)=>fetch(`${SUPA_URL}/auth/v1/recover`,{method:'POST',headers:sb.h(),body:JSON.stringify({email:e})}).then(r=>r.ok?{}:r.json()),
+  updateUserPassword:(accessToken,newPassword)=>fetch(`${SUPA_URL}/auth/v1/user`,{method:'PUT',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},body:JSON.stringify({password:newPassword})}).then(r=>r.json()),
 };
 
 /* ══ PRODUCTS ══ */
@@ -1166,8 +1171,52 @@ function refreshAccountUI(){
     document.getElementById('profileInitial').textContent=name.charAt(0).toUpperCase();
   }else{lf.style.display='block';rf.style.display='none';pv.style.display='none';}
 }
-function showRegister(){stopPollingConfirmation();document.getElementById('pending-confirm').style.display='none';document.getElementById('login-form').style.display='none';document.getElementById('register-form').style.display='block';}
-function showLogin(){stopPollingConfirmation();document.getElementById('pending-confirm').style.display='none';document.getElementById('register-form').style.display='none';document.getElementById('login-form').style.display='block';}
+function hideAllAuthScreens(){
+  ['login-form','register-form','pending-confirm','forgot-form','forgot-sent','new-password-form','profile-view'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.style.display='none';
+  });
+}
+function showRegister(){stopPollingConfirmation();hideAllAuthScreens();document.getElementById('register-form').style.display='block';}
+function showLogin(){stopPollingConfirmation();hideAllAuthScreens();document.getElementById('login-form').style.display='block';}
+function showForgotPassword(){hideAllAuthScreens();document.getElementById('forgot-form').style.display='block';}
+
+async function doForgotPassword(){
+  const email=document.getElementById('forgotEmail').value.trim();
+  if(!email){showToast('enter your email','error');return;}
+  try{
+    await sb.recover(email);
+    hideAllAuthScreens();
+    document.getElementById('forgotSentEmail').textContent=email;
+    document.getElementById('forgot-sent').style.display='block';
+  }catch(e){
+    showToast('something went wrong — please try again','error');
+  }
+}
+
+async function doSetNewPassword(){
+  const newPass=document.getElementById('newPass').value;
+  if(!newPass||newPass.length<6){showToast('password must be at least 6 characters','error');return;}
+  const hash=new URLSearchParams(window.location.hash.slice(1));
+  const accessToken=hash.get('access_token');
+  if(!accessToken){showToast('reset link expired — request a new one','error');showLogin();return;}
+  try{
+    const res=await sb.updateUserPassword(accessToken,newPass);
+    if(res.error){showToast(res.error?.message||'failed to update password','error');return;}
+    history.replaceState(null,'',window.location.pathname+window.location.search);
+    showToast('password updated — please sign in','success');
+    showLogin();
+  }catch(e){
+    showToast('something went wrong — please try again','error');
+  }
+}
+
+function checkPasswordRecoveryCallback(){
+  if(window.location.hash.includes('type=recovery')){
+    openAccount();
+    hideAllAuthScreens();
+    document.getElementById('new-password-form').style.display='block';
+  }
+}
 function togglePassVis(id,btn){
   const inp=document.getElementById(id);const show=inp.type==='password';inp.type=show?'text':'password';
   btn.innerHTML=show?'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17.94 17.94A10 10 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>':'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
@@ -1514,6 +1563,7 @@ if(typeof buildGrids !== 'undefined'){
     buildGrids();
     if(typeof doSearch==='function') doSearch('');
   });
+  checkPasswordRecoveryCallback();
 }
 </script>
 </body>
