@@ -123,7 +123,8 @@ section{position:relative;z-index:1}
 .card-zoom{opacity:1;transform:scale(1);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
 
 .d1{transition-delay:.05s}.d2{transition-delay:.18s}.d3{transition-delay:.32s}.d4{transition-delay:.46s}
-.reveal{transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1)}
+.reveal{opacity:0;transform:translateY(36px);transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1)}
+.reveal.in{opacity:1;transform:translateY(0)}
 
 .rd1{transition-delay:.1s}.rd2{transition-delay:.22s}.rd3{transition-delay:.36s}
 #drops{padding:100px 24px;max-width:1400px;margin:0 auto}
@@ -587,17 +588,27 @@ footer{padding:60px 24px 40px;border-top:1px solid rgba(255,255,255,.06);max-wid
   <div class="nl-head reveal">get the<br/><span style="color:#e63329">mud</span></div>
   <p class="nl-sub reveal rd1">first access to limited drops. no spam. just the mud.</p>
   <div class="nl-form reveal rd2"><input class="nl-input" type="email" placeholder="your@email.com"/><button class="nl-btn">join</button></div>
+
+  <div class="reveal rd3" style="margin-top:72px;padding-top:40px;border-top:1px solid rgba(255,255,255,.08);display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start;justify-content:center;text-align:center">
+    <div>
+      <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:16px">get in touch</div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center">
+        <a href="https://www.instagram.com/the_mud_street.wear" target="_blank" rel="noopener" style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.75);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.18);padding-bottom:2px">instagram</a>
+        <span onclick="openLegal('contact')" style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.75);cursor:pointer;border-bottom:1px solid rgba(255,255,255,.18);padding-bottom:2px">contact us</span>
+      </div>
+    </div>
+  </div>
+  <div class="reveal" style="margin-top:24px;display:flex;gap:14px;flex-wrap:wrap;justify-content:center">
+    <span onclick="openLegal('sizing')" style="font-size:12px;letter-spacing:.04em;color:rgba(255,255,255,.5);cursor:pointer">sizing guide</span>
+    <span onclick="openLegal('shipping')" style="font-size:12px;letter-spacing:.04em;color:rgba(255,255,255,.5);cursor:pointer">shipping</span>
+    <span onclick="openLegal('returns')" style="font-size:12px;letter-spacing:.04em;color:rgba(255,255,255,.5);cursor:pointer">returns</span>
+    <span onclick="openLegal('privacy')" style="font-size:12px;letter-spacing:.04em;color:rgba(255,255,255,.5);cursor:pointer">privacy</span>
+    <span onclick="openLegal('terms')" style="font-size:12px;letter-spacing:.04em;color:rgba(255,255,255,.5);cursor:pointer">terms</span>
+  </div>
+  <div class="reveal" style="margin-top:20px;font-size:10px;letter-spacing:.08em;color:rgba(255,255,255,.25);text-align:center">© 2026 m.u.d misunderstood. all rights reserved.</div>
 </section>
 
-<footer>
-  <div class="footer-grid">
-    <div><div class="footer-brand">M.U.D<br/>Misunderstood</div><div class="footer-tag">not defined. not explained. just different. centurion, south africa.</div></div>
-    <div><div class="footer-col-title">shop</div><ul class="footer-links"><li><a onclick="scrollToSection('drops')">new arrivals</a></li><li><a onclick="openPanel('hoodies',400,400)">hoodies</a></li><li><a onclick="openPanel('tees',400,400)">tees</a></li><li><a onclick="openPanel('bottoms',400,400)">bottoms</a></li><li><a onclick="openPanel('sneakers',400,400)">sneakers</a></li><li><a onclick="openPanel('tracksuits',400,400)">tracksuits</a></li></ul></div>
-    <div><div class="footer-col-title">info</div><ul class="footer-links"><li><a onclick="scrollToSection('story')">about us</a></li><li><a onclick="openLegal('sizing')">sizing guide</a></li><li><a onclick="openLegal('shipping')">shipping</a></li><li><a onclick="openLegal('returns')">returns</a></li></ul></div>
-    <div><div class="footer-col-title">connect</div><ul class="footer-links"><li><a href="https://www.instagram.com/the_mud_street.wear" target="_blank" rel="noopener">instagram</a></li><li><a onclick="openLegal('contact')">contact us</a></li><li><a onclick="openAccount()">my account</a></li></ul></div>
-  </div>
-  <div class="footer-bottom"><span>© 2026 m.u.d misunderstood. all rights reserved.</span><span><a onclick="openLegal('privacy')" style="cursor:pointer;color:inherit;text-decoration:underline">privacy</a> · <a onclick="openLegal('terms')" style="cursor:pointer;color:inherit;text-decoration:underline">terms</a></span></div>
-</footer>
+
 </div>
 
 <!-- ══ LEGAL / INFO MODAL ══ -->
