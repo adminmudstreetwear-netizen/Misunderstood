@@ -240,7 +240,7 @@ footer{padding:60px 24px 40px;border-top:1px solid rgba(255,255,255,.06);max-wid
 .cat-panel.open .cat-page-grid{opacity:1;transform:translateY(0)}
 .mini-card{border-radius:8px;overflow:hidden;cursor:pointer;background:#d4d1cc;border:1px solid rgba(255,255,255,.04);transition:transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s,border-color .3s}
 .mini-card:hover{transform:translateY(-10px) scale(1.02);box-shadow:0 20px 40px rgba(0,0,0,.6);border-color:rgba(255,255,255,.14)}
-.mini-card-visual{aspect-ratio:3/4;position:relative;overflow:hidden;transition:transform .4s;background:#111;display:flex;align-items:center;justify-content:center}
+.mini-card-visual{aspect-ratio:3/4;position:relative;overflow:hidden;transition:transform .4s;background:#d4d1cc;display:flex;align-items:center;justify-content:center}
 .mini-card:hover .mini-card-visual img{transform:scale(1.06);transition:transform .6s cubic-bezier(.22,1,.36,1)}
 .mini-card-info{padding:14px 16px;background:#0a0a0a;border-top:1px solid rgba(0,0,0,.2)}
 .mini-card-name{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.02em;color:#fff}
@@ -984,7 +984,11 @@ const LIFESTYLE_PHOTOS = {
 };
 
 let CAT_MAP = {};
-function rebuildCatMap(){ CAT_MAP={}; PRODUCTS.forEach(p=>{ (CAT_MAP[p.cat]=CAT_MAP[p.cat]||[]).push(p); }); }
+// Products hidden from category/shop browsing but still fully usable elsewhere
+// (New Arrivals cards, direct product links, cart, checkout) — not deleted, just excluded from grids
+const HIDDEN_FROM_CATEGORIES = ['mud-tshirt-7', 'mud-classic-hoodie-crm', 'mud-sp-goth-star-blk'];
+
+function rebuildCatMap(){ CAT_MAP={}; PRODUCTS.forEach(p=>{ if(HIDDEN_FROM_CATEGORIES.includes(p.id))return; (CAT_MAP[p.cat]=CAT_MAP[p.cat]||[]).push(p); }); }
 
 let currentUser = null;
 let cart = JSON.parse(localStorage.getItem('mud_cart')||'[]');
@@ -1012,7 +1016,7 @@ function catShape(cat){
 function buildGrids(){
   rebuildCatMap();
   const countMap={};
-  PRODUCTS.forEach(p=>{ countMap[p.cat]=(countMap[p.cat]||0)+1; });
+  PRODUCTS.forEach(p=>{ if(HIDDEN_FROM_CATEGORIES.includes(p.id))return; countMap[p.cat]=(countMap[p.cat]||0)+1; });
   document.querySelectorAll('.cat-count').forEach(el=>{
     const card=el.closest('[data-cat]');if(!card)return;
     const cat=card.getAttribute('data-cat');
@@ -1068,7 +1072,7 @@ function openProductModal(pid){
     frontImg.style.objectFit='contain'; frontImg.style.objectPosition='center';
     backImg.style.objectFit='contain'; backImg.style.objectPosition='center';
   }
-  const cardBg='#111';
+  const cardBg='#d4d1cc';
   document.querySelectorAll('#pm-card > div').forEach(face=>face.style.background=cardBg);
   document.getElementById('pm-img-side').style.background=cardBg;
   const card=document.getElementById('pm-card');
