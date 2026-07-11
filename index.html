@@ -240,7 +240,7 @@ footer{padding:60px 24px 40px;border-top:1px solid rgba(255,255,255,.06);max-wid
 .cat-panel.open .cat-page-grid{opacity:1;transform:translateY(0)}
 .mini-card{border-radius:8px;overflow:hidden;cursor:pointer;background:#d4d1cc;border:1px solid rgba(255,255,255,.04);transition:transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s,border-color .3s}
 .mini-card:hover{transform:translateY(-10px) scale(1.02);box-shadow:0 20px 40px rgba(0,0,0,.6);border-color:rgba(255,255,255,.14)}
-.mini-card-visual{aspect-ratio:3/4;position:relative;overflow:hidden;transition:transform .4s;background:#d4d1cc;display:flex;align-items:center;justify-content:center}
+.mini-card-visual{aspect-ratio:3/4;position:relative;overflow:hidden;transition:transform .4s;background:#111;display:flex;align-items:center;justify-content:center}
 .mini-card:hover .mini-card-visual img{transform:scale(1.06);transition:transform .6s cubic-bezier(.22,1,.36,1)}
 .mini-card-info{padding:14px 16px;background:#0a0a0a;border-top:1px solid rgba(0,0,0,.2)}
 .mini-card-name{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.02em;color:#fff}
@@ -974,6 +974,15 @@ const sb={
 /* ══ PRODUCTS ══ */
 let PRODUCTS = [];
 
+// Products whose photos are full-body lifestyle shots rather than tight product shots —
+// these get object-fit:cover with a tuned focal point instead of the default contain,
+// so they read as a proper zoomed-in product photo instead of a small figure in empty space.
+const LIFESTYLE_PHOTOS = {
+  'mud-tshirt-7': { pos: 'center 15%' },
+  'mud-classic-hoodie-crm': { pos: 'center 15%' },
+  'mud-sp-goth-star-blk': { pos: 'center 60%' }
+};
+
 let CAT_MAP = {};
 function rebuildCatMap(){ CAT_MAP={}; PRODUCTS.forEach(p=>{ (CAT_MAP[p.cat]=CAT_MAP[p.cat]||[]).push(p); }); }
 
@@ -1021,9 +1030,11 @@ function buildGrids(){
     if(!withImgs.length){grid.innerHTML='<p style="color:rgba(255,255,255,.25);padding:24px;font-size:12px;letter-spacing:.1em;text-transform:uppercase">coming soon</p>';return;}
     grid.innerHTML=withImgs.map(p=>{
       const priceHtml=formatPrice(p.price);
+      const zoom=LIFESTYLE_PHOTOS[p.id];
+      const imgStyle=zoom?`width:100%;height:100%;object-fit:cover;object-position:${zoom.pos};display:block`:`width:100%;height:100%;object-fit:contain;display:block`;
       return`<div class="mini-card" onclick="openProductModal('${p.id}')">
-        <div class="mini-card-visual" style="overflow:hidden;background:#d4d1cc;display:flex;align-items:center;justify-content:center">
-          <img src="${p.front}" style="width:100%;height:100%;object-fit:contain;display:block" alt="${p.name}" loading="lazy"/>
+        <div class="mini-card-visual" style="overflow:hidden;display:flex;align-items:center;justify-content:center">
+          <img src="${p.front}" style="${imgStyle}" alt="${p.name}" loading="lazy"/>
         </div>
         <div class="mini-card-info">
           <div class="mini-card-name">${p.name}</div>
@@ -1049,7 +1060,15 @@ function openProductModal(pid){
   frontImg.style.filter='none'; backImg.style.filter='none';
   frontImg.style.display=p.front?'block':'none';
   backImg.style.display=(p.back||p.front)?'block':'none';
-  const cardBg='#d4d1cc';
+  const zoom=LIFESTYLE_PHOTOS[p.id];
+  if(zoom){
+    frontImg.style.objectFit='cover'; frontImg.style.objectPosition=zoom.pos;
+    backImg.style.objectFit='cover'; backImg.style.objectPosition=zoom.pos;
+  }else{
+    frontImg.style.objectFit='contain'; frontImg.style.objectPosition='center';
+    backImg.style.objectFit='contain'; backImg.style.objectPosition='center';
+  }
+  const cardBg='#111';
   document.querySelectorAll('#pm-card > div').forEach(face=>face.style.background=cardBg);
   document.getElementById('pm-img-side').style.background=cardBg;
   const card=document.getElementById('pm-card');
