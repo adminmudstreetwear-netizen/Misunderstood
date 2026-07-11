@@ -729,6 +729,18 @@ footer{padding:60px 24px 40px;border-top:1px solid rgba(255,255,255,.06);max-wid
   <div class="cart-items" id="cartItems"><div class="cart-empty"><svg viewBox="0 0 24 24" fill="none" stroke-width="1"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="currentColor"/><line x1="3" y1="6" x2="21" y2="6" stroke="currentColor"/><path d="M16 10a4 4 0 01-8 0" stroke="currentColor"/></svg><p>your cart is empty</p></div></div>
   <div class="cart-footer">
     <div class="cart-subtotal"><span class="cart-subtotal-label">subtotal</span><span class="cart-subtotal-val" id="cartTotal">R 0</span></div>
+    <div id="deliveryOptions" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+      <label style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border:1px solid rgba(255,255,255,.12);border-radius:10px;cursor:pointer;font-size:12px" id="deliveryStandardLabel">
+        <span style="display:flex;align-items:center;gap:10px"><input type="radio" name="deliveryOption" value="standard" checked onchange="updateDeliveryDisplay()" style="accent-color:#e63329"/> <span>standard <span style="color:rgba(255,255,255,.4)">— 7–10 working days</span></span></span>
+        <span id="standardFeeLabel" style="color:#fff;font-weight:600">R 85</span>
+      </label>
+      <label style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border:1px solid rgba(255,255,255,.12);border-radius:10px;cursor:pointer;font-size:12px">
+        <span style="display:flex;align-items:center;gap:10px"><input type="radio" name="deliveryOption" value="express" onchange="updateDeliveryDisplay()" style="accent-color:#e63329"/> <span>express <span style="color:rgba(255,255,255,.4)">— 4–7 working days</span></span></span>
+        <span style="color:#fff;font-weight:600">R 120</span>
+      </label>
+    </div>
+    <div class="cart-subtotal" style="margin-bottom:6px"><span class="cart-subtotal-label">delivery</span><span class="cart-subtotal-val" id="cartDeliveryFee" style="font-size:14px">R 85</span></div>
+    <div class="cart-subtotal" style="margin-bottom:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)"><span class="cart-subtotal-label" style="font-weight:700">total</span><span class="cart-subtotal-val" id="cartGrandTotal">R 0</span></div>
     <button class="checkout-btn" onclick="checkout()">proceed to checkout</button>
     <button class="cart-continue" onclick="closeCart()">continue shopping</button>
   </div>
@@ -918,7 +930,7 @@ function setCurrency(code){
 function refreshAllPrices(){
   // re-render whatever's currently on screen that shows prices
   if(typeof buildGrids==='function') buildGrids();
-  if(typeof renderCart==='function') renderCart();
+  if(typeof updateCartUI==='function') updateCartUI();
   if(typeof renderOrders==='function') renderOrders();
   if(typeof modalProduct!=='undefined' && modalProduct && document.getElementById('pm-price')) document.getElementById('pm-price').textContent=formatPrice(modalProduct.price);
 }
@@ -1108,6 +1120,26 @@ function addToCart(product,colour,size){
   if(ex){ex.qty++;}else{cart.push({key,id:product.id,name:product.name,price,colour:colour.name,colourHex:colour.hex,size,qty:1,front:product.front});}
   saveCart();showToast(product.name+' added to cart ✓','success');setTimeout(openCart,350);
 }
+function getSelectedDeliveryOption(){
+  const checked=document.querySelector('input[name="deliveryOption"]:checked');
+  return checked ? checked.value : 'standard';
+}
+function updateDeliveryDisplay(){
+  const sub=cart.reduce((s,i)=>s+i.price*i.qty,0); // raw ZAR — free-shipping threshold is always in ZAR
+  const option=getSelectedDeliveryOption();
+  const standardFee=sub>=500?0:85;
+  const fee=option==='express'?120:standardFee;
+
+  const sfl=document.getElementById('standardFeeLabel');
+  if(sfl) sfl.innerHTML = standardFee===0 ? '<span style="color:#4ade80">FREE</span>' : formatPrice(85);
+
+  const dfEl=document.getElementById('cartDeliveryFee');
+  if(dfEl) dfEl.innerHTML = fee===0 ? '<span style="color:#4ade80">FREE</span>' : formatPrice(fee);
+
+  const gtEl=document.getElementById('cartGrandTotal');
+  if(gtEl) gtEl.textContent = formatPrice(sub+fee);
+}
+
 function updateCartUI(){
   const total=cart.reduce((s,i)=>s+i.qty,0);
   const sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
@@ -1115,6 +1147,7 @@ function updateCartUI(){
   if(badge){badge.textContent=total;badge.classList.toggle('show',total>0);}
   const cnt=document.getElementById('cartItemCount');if(cnt)cnt.textContent=total;
   const tot=document.getElementById('cartTotal');if(tot)tot.textContent=formatPrice(sub);
+  updateDeliveryDisplay();
   const el=document.getElementById('cartItems');if(!el)return;
   if(!cart.length){el.innerHTML='<div class="cart-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" width="48" height="48"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><p>your cart is empty</p></div>';return;}
   el.innerHTML=cart.map((item,idx)=>`
@@ -1143,10 +1176,46 @@ function closeCart(){document.getElementById('cart-drawer').classList.remove('op
 async function checkout(){
   if(!cart.length)return;
   if(!currentUser){closeCart();openAccount();showToast('please sign in to checkout','error');return;}
-  const orderId='MUD-'+Date.now().toString().slice(-6);
-  const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
-  try{await sb.post('orders',{id:orderId,user_id:currentUser.id,items:[...cart],total,status:'processing'});cart=[];saveCart();closeCart();showToast('order placed! check your account','success');}
-  catch(e){showToast('checkout failed — please try again','error');}
+  const session=JSON.parse(localStorage.getItem('cs_sb')||'null');
+  if(!session?.access_token){showToast('please sign in again','error');return;}
+  showToast('redirecting to secure payment...','success');
+  try{
+    const res=await fetch('/api/payfast-checkout',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},
+      body:JSON.stringify({
+        items:cart.map(i=>({id:i.id,size:i.size,qty:i.qty})),
+        deliveryOption:getSelectedDeliveryOption()
+      })
+    });
+    const data=await res.json();
+    if(!res.ok){showToast(data.error||'checkout failed','error');return;}
+    const form=document.createElement('form');
+    form.method='POST';
+    form.action=data.action;
+    Object.entries(data.fields).forEach(([k,v])=>{
+      const input=document.createElement('input');
+      input.type='hidden'; input.name=k; input.value=v;
+      form.appendChild(input);
+    });
+    document.body.appendChild(form);
+    form.submit();
+  }catch(e){
+    showToast('checkout failed — please try again','error');
+  }
+}
+
+function checkPaymentReturnStatus(){
+  const params=new URLSearchParams(window.location.search);
+  const status=params.get('payment');
+  if(status==='success'){
+    cart=[]; saveCart();
+    showToast('payment received! check your account for order status','success');
+    history.replaceState(null,'',window.location.pathname);
+  }else if(status==='cancelled'){
+    showToast('payment cancelled — your cart is still saved','error');
+    history.replaceState(null,'',window.location.pathname);
+  }
 }
 
 /* ══ ACCOUNT ══ */
@@ -1564,6 +1633,7 @@ if(typeof buildGrids !== 'undefined'){
     if(typeof doSearch==='function') doSearch('');
   });
   checkPasswordRecoveryCallback();
+  checkPaymentReturnStatus();
 }
 </script>
 </body>
