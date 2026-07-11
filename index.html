@@ -948,10 +948,21 @@ const SUPA_URL='https://ivwoeqbeblwvkmqkwbuk.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2d29lcWJlYmx3dmttcWt3YnVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0MDI2NTIsImV4cCI6MjA5Nzk3ODY1Mn0.I0P0_j14Db-HmagIK12yAFHiUuM1Upcj3Auvm1SeJRo';
 const sb={
   h:()=>{const s=JSON.parse(localStorage.getItem('cs_sb')||'null');return{'apikey':SUPA_KEY,'Authorization':'Bearer '+(s?.access_token||SUPA_KEY),'Content-Type':'application/json','Prefer':'return=representation'};},
-  get:(t,q='')=>fetch(`${SUPA_URL}/rest/v1/${t}${q}`,{headers:sb.h()}).then(r=>r.json()),
-  post:(t,b)=>fetch(`${SUPA_URL}/rest/v1/${t}`,{method:'POST',headers:sb.h(),body:JSON.stringify(b)}).then(r=>r.json()),
-  patch:(t,q,b)=>fetch(`${SUPA_URL}/rest/v1/${t}${q}`,{method:'PATCH',headers:sb.h(),body:JSON.stringify(b)}).then(r=>r.json()),
-  del:(t,q)=>fetch(`${SUPA_URL}/rest/v1/${t}${q}`,{method:'DELETE',headers:sb.h()}).then(r=>r.json()),
+  async _fetchWithRetry(url,opts){
+    let res=await fetch(url,opts);
+    if(res.status===401 && localStorage.getItem('cs_sb')){
+      // Stored session token is expired/invalid — clear it and retry as a public/anonymous request
+      localStorage.removeItem('cs_sb');
+      currentUser=null;
+      const freshHeaders={...opts.headers, ...sb.h()};
+      res=await fetch(url,{...opts,headers:freshHeaders});
+    }
+    return res;
+  },
+  get:async(t,q='')=>{const r=await sb._fetchWithRetry(`${SUPA_URL}/rest/v1/${t}${q}`,{headers:sb.h()});return r.json();},
+  post:async(t,b)=>{const r=await sb._fetchWithRetry(`${SUPA_URL}/rest/v1/${t}`,{method:'POST',headers:sb.h(),body:JSON.stringify(b)});return r.json();},
+  patch:async(t,q,b)=>{const r=await sb._fetchWithRetry(`${SUPA_URL}/rest/v1/${t}${q}`,{method:'PATCH',headers:sb.h(),body:JSON.stringify(b)});return r.json();},
+  del:async(t,q)=>{const r=await sb._fetchWithRetry(`${SUPA_URL}/rest/v1/${t}${q}`,{method:'DELETE',headers:sb.h()});return r.json();},
   signIn:(e,p)=>fetch(`${SUPA_URL}/auth/v1/token?grant_type=password`,{method:'POST',headers:sb.h(),body:JSON.stringify({email:e,password:p})}).then(r=>r.json()),
   signUp:(e,p,n)=>fetch(`${SUPA_URL}/auth/v1/signup`,{method:'POST',headers:sb.h(),body:JSON.stringify({email:e,password:p,data:{full_name:n}})}).then(r=>r.json()),
   signOut:()=>{localStorage.removeItem('cs_sb');currentUser=null;},
