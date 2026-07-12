@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>M.U.D Admin</title>
+<meta name="robots" content="noindex, nofollow"/>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Readex Pro',sans-serif;background:#060606;color:#fff;min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto;padding:32px 24px 80px}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.logo{font-size:18px;font-weight:700;letter-spacing:-.02em;text-transform:uppercase}
+.logo span{color:#e63329}
+.signout{font-size:12px;color:rgba(255,255,255,.5);cursor:pointer;text-decoration:underline}
+.tabs{display:flex;gap:8px;margin-bottom:24px}
+.tab{padding:10px 20px;border-radius:999px;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);transition:all .2s}
+.tab.active{background:#e63329;border-color:#e63329;color:#fff}
+.card{background:#0d0d0d;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:20px;margin-bottom:14px}
+.row{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.pname{font-size:14px;font-weight:600;flex:1;min-width:200px}
+.pmeta{font-size:11px;color:rgba(255,255,255,.4);margin-top:4px}
+input[type=number],input[type=text],select{background:#151515;border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;font-family:inherit;width:80px}
+select{width:auto;cursor:pointer}
+.sizes{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.size-input{display:flex;flex-direction:column;align-items:center;gap:4px}
+.size-input label{font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase}
+.size-input input{width:50px;text-align:center}
+.size-input.soldout input{border-color:#e63329;color:#e63329}
+.btn{background:#e63329;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:background .2s}
+.btn:hover{background:#ff4438}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7)}
+.toggle{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,.6);cursor:pointer}
+.order-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.order-id{font-size:13px;font-weight:700}
+.order-date{font-size:11px;color:rgba(255,255,255,.4)}
+.order-status{font-size:10px;padding:4px 10px;border-radius:999px;text-transform:uppercase;font-weight:600;letter-spacing:.04em}
+.st-processing{background:rgba(230,51,41,.15);color:#e63329}
+.st-shipped{background:rgba(59,130,246,.15);color:#3b82f6}
+.st-delivered{background:rgba(74,222,128,.15);color:#4ade80}
+.st-cancelled{background:rgba(255,255,255,.08);color:rgba(255,255,255,.4)}
+.order-items{font-size:12px;color:rgba(255,255,255,.6);line-height:1.8;margin:10px 0}
+.order-total{font-size:13px;font-weight:700;margin-top:8px}
+.login-wrap{max-width:360px;margin:120px auto;text-align:center}
+.login-wrap input{width:100%;margin-bottom:12px;padding:12px;font-size:13px}
+.login-wrap .btn{width:100%;padding:12px}
+.toast{position:fixed;bottom:24px;right:24px;background:#151515;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:12px 20px;font-size:12px;z-index:999;display:none}
+.toast.show{display:block}
+.toast.error{border-color:#e63329;color:#e63329}
+.toast.success{border-color:#4ade80;color:#4ade80}
+.empty{text-align:center;color:rgba(255,255,255,.3);font-size:13px;padding:40px}
+</style>
+</head>
+<body>
+
+<div id="login-screen" class="login-wrap">
+  <div class="logo" style="margin-bottom:24px">M.U.D <span>ADMIN</span></div>
+  <input type="email" id="loginEmail" placeholder="admin email"/>
+  <input type="password" id="loginPass" placeholder="password"/>
+  <button class="btn" onclick="doAdminLogin()">sign in</button>
+</div>
+
+<div id="admin-app" style="display:none">
+  <div class="wrap">
+    <div class="header">
+      <div class="logo">M.U.D <span>ADMIN</span></div>
+      <div class="signout" onclick="doAdminLogout()">sign out</div>
+    </div>
+    <div class="tabs">
+      <div class="tab active" id="tab-products" onclick="switchAdminTab('products')">products</div>
+      <div class="tab" id="tab-orders" onclick="switchAdminTab('orders')">orders</div>
+    </div>
+    <div id="products-panel"></div>
+    <div id="orders-panel" style="display:none"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const SUPA_URL='https://ivwoeqbeblwvkmqkwbuk.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2d29lcWJlYmx3dmttcWt3YnVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0MDI2NTIsImV4cCI6MjA5Nzk3ODY1Mn0.I0P0_j14Db-HmagIK12yAFHiUuM1Upcj3Auvm1SeJRo';
+let adminSession=null;
+
+function toast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+type;
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+function h(){
+  return {'apikey':SUPA_KEY,'Authorization':'Bearer '+(adminSession?.access_token||SUPA_KEY),'Content-Type':'application/json','Prefer':'return=representation'};
+}
+
+async function doAdminLogin(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  if(!email||!pass){toast('enter email and password','error');return;}
+  try{
+    const res=await fetch(`${SUPA_URL}/auth/v1/token?grant_type=password`,{
+      method:'POST',headers:{'apikey':SUPA_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({email,password:pass})
+    });
+    const data=await res.json();
+    if(data.error||!data.access_token){toast('sign in failed','error');return;}
+    adminSession=data;
+    localStorage.setItem('mud_admin_session',JSON.stringify(data));
+    showAdminApp();
+  }catch(e){toast('sign in failed','error');}
+}
+
+function doAdminLogout(){
+  localStorage.removeItem('mud_admin_session');
+  adminSession=null;
+  document.getElementById('admin-app').style.display='none';
+  document.getElementById('login-screen').style.display='block';
+}
+
+function showAdminApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('admin-app').style.display='block';
+  loadProducts();
+}
+
+function switchAdminTab(tab){
+  document.getElementById('tab-products').classList.toggle('active',tab==='products');
+  document.getElementById('tab-orders').classList.toggle('active',tab==='orders');
+  document.getElementById('products-panel').style.display=tab==='products'?'block':'none';
+  document.getElementById('orders-panel').style.display=tab==='orders'?'block':'none';
+  if(tab==='orders') loadOrders();
+}
+
+async function loadProducts(){
+  const panel=document.getElementById('products-panel');
+  panel.innerHTML='<div class="empty">loading...</div>';
+  try{
+    const res=await fetch(`${SUPA_URL}/rest/v1/products?select=*&order=category,name`,{headers:h()});
+    const products=await res.json();
+    if(!Array.isArray(products)||!products.length){panel.innerHTML='<div class="empty">no products found</div>';return;}
+    panel.innerHTML=products.map(p=>renderProductCard(p)).join('');
+  }catch(e){panel.innerHTML='<div class="empty">failed to load products</div>';}
+}
+
+function renderProductCard(p){
+  const sizes=p.sizes||[];
+  const stock=p.stock_by_size||{};
+  const soldOut=p.sold_out_sizes||[];
+  const sizeInputs=sizes.map(sz=>{
+    const isSoldOut=soldOut.includes(sz);
+    return `<div class="size-input ${isSoldOut?'soldout':''}">
+      <label>${sz}</label>
+      <input type="number" min="0" value="${stock[sz]||0}" id="stock-${p.id}-${sz}" onchange="markDirty('${p.id}')"/>
+    </div>`;
+  }).join('');
+  return `<div class="card" id="card-${p.id}">
+    <div class="row">
+      <div style="flex:1;min-width:220px">
+        <div class="pname">${p.name}</div>
+        <div class="pmeta">${p.id} &middot; ${p.category}</div>
+      </div>
+      <div>
+        <label class="pmeta">price (R)</label><br/>
+        <input type="number" id="price-${p.id}" value="${p.price}" onchange="markDirty('${p.id}')"/>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="instock-${p.id}" ${p.in_stock!==false?'checked':''} onchange="markDirty('${p.id}')"/>
+        in stock
+      </label>
+    </div>
+    <div class="sizes">${sizeInputs||'<span class="pmeta">no sizes configured</span>'}</div>
+    <div style="margin-top:14px;display:flex;gap:8px">
+      <button class="btn" id="save-${p.id}" onclick="saveProduct('${p.id}')" disabled>save changes</button>
+    </div>
+  </div>`;
+}
+
+function markDirty(pid){
+  const btn=document.getElementById('save-'+pid);
+  if(btn) btn.disabled=false;
+}
+
+async function saveProduct(pid){
+  const price=parseInt(document.getElementById('price-'+pid).value,10);
+  const inStock=document.getElementById('instock-'+pid).checked;
+  const card=document.getElementById('card-'+pid);
+  const sizeInputs=card.querySelectorAll('[id^="stock-'+pid+'-"]');
+  const stockBySize={};
+  const soldOutSizes=[];
+  sizeInputs.forEach(inp=>{
+    const size=inp.id.split('-').pop();
+    const qty=parseInt(inp.value,10)||0;
+    stockBySize[size]=qty;
+    if(qty<=0) soldOutSizes.push(size);
+  });
+  try{
+    const res=await fetch(`${SUPA_URL}/rest/v1/products?id=eq.${pid}`,{
+      method:'PATCH',headers:h(),
+      body:JSON.stringify({price,in_stock:inStock,stock_by_size:stockBySize,sold_out_sizes:soldOutSizes})
+    });
+    if(!res.ok){toast('save failed — check you are signed in as admin','error');return;}
+    toast('saved');
+    document.getElementById('save-'+pid).disabled=true;
+  }catch(e){toast('save failed','error');}
+}
+
+async function loadOrders(){
+  const panel=document.getElementById('orders-panel');
+  panel.innerHTML='<div class="empty">loading...</div>';
+  try{
+    const res=await fetch(`${SUPA_URL}/rest/v1/orders?select=*&order=created_at.desc`,{headers:h()});
+    const orders=await res.json();
+    if(!Array.isArray(orders)||!orders.length){panel.innerHTML='<div class="empty">no orders yet</div>';return;}
+    panel.innerHTML=orders.map(o=>renderOrderCard(o)).join('');
+  }catch(e){panel.innerHTML='<div class="empty">failed to load orders</div>';}
+}
+
+function renderOrderCard(o){
+  const date=new Date(o.created_at).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});
+  const items=(o.items||[]).map(i=>`${i.qty}x ${i.id} (${i.size})`).join('<br/>');
+  const statuses=['processing','shipped','delivered','cancelled'];
+  const options=statuses.map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('');
+  return `<div class="card">
+    <div class="order-top">
+      <div><span class="order-id">${o.id}</span> &nbsp; <span class="order-date">${date}</span></div>
+      <span class="order-status st-${o.status}">${o.status}</span>
+    </div>
+    <div class="order-items">${items}</div>
+    <div class="order-total">total: R ${o.total} &middot; delivery: ${o.delivery_option||'standard'} (R ${o.delivery_fee||0})</div>
+    <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+      <select id="status-${o.id}">${options}</select>
+      <button class="btn btn-ghost" onclick="updateOrderStatus('${o.id}')">update status</button>
+    </div>
+  </div>`;
+}
+
+async function updateOrderStatus(oid){
+  const status=document.getElementById('status-'+oid).value;
+  try{
+    const res=await fetch(`${SUPA_URL}/rest/v1/orders?id=eq.${oid}`,{
+      method:'PATCH',headers:h(),
+      body:JSON.stringify({status})
+    });
+    if(!res.ok){toast('update failed — check you are signed in as admin','error');return;}
+    toast('order updated — customer notified by email');
+    loadOrders();
+  }catch(e){toast('update failed','error');}
+}
+
+// Restore session if present
+(function(){
+  try{
+    const stored=JSON.parse(localStorage.getItem('mud_admin_session')||'null');
+    if(stored?.access_token){ adminSession=stored; showAdminApp(); }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
