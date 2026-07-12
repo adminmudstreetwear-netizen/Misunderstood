@@ -241,6 +241,10 @@ footer{padding:60px 24px 40px;border-top:1px solid rgba(255,255,255,.06);max-wid
 .mini-card{border-radius:8px;overflow:hidden;cursor:pointer;background:#d4d1cc;border:1px solid rgba(255,255,255,.04);transition:transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s,border-color .3s}
 .mini-card:hover{transform:translateY(-10px) scale(1.02);box-shadow:0 20px 40px rgba(0,0,0,.6);border-color:rgba(255,255,255,.14)}
 .mini-card-visual{aspect-ratio:3/4;position:relative;overflow:hidden;transition:transform .4s;background:#d4d1cc;display:flex;align-items:center;justify-content:center}
+.wish-btn{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;background:rgba(6,6,6,.55);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.15);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;transition:all .2s}
+.wish-btn:hover{background:rgba(6,6,6,.8);transform:scale(1.08)}
+.wish-btn.active{color:#e63329;border-color:rgba(230,51,41,.4)}
+.wish-btn.active svg{fill:#e63329}
 .mini-card:hover .mini-card-visual img{transform:scale(1.06);transition:transform .6s cubic-bezier(.22,1,.36,1)}
 .mini-card-info{padding:14px 16px;background:#0a0a0a;border-top:1px solid rgba(0,0,0,.2)}
 .mini-card-name{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.02em;color:#fff}
@@ -644,7 +648,12 @@ footer{padding:60px 24px 40px;border-top:1px solid rgba(255,255,255,.06);max-wid
     <div class="pm-info-side-inner" style="padding:44px 40px;display:flex;flex-direction:column;gap:0;overflow-y:auto">
       <div id="pm-cat" style="font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:#e63329;margin-bottom:14px">— hoodies</div>
       <h2 id="pm-name" style="font-size:1.4rem;font-weight:700;letter-spacing:-.02em;text-transform:uppercase;line-height:1.1;margin-bottom:8px">Product Name</h2>
-      <div id="pm-price" style="font-size:1.5rem;font-weight:700;letter-spacing:-.02em;color:#fff;margin-bottom:16px">R 0</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div id="pm-price" style="font-size:1.5rem;font-weight:700;letter-spacing:-.02em;color:#fff;margin-bottom:0">R 0</div>
+        <button id="pm-wish-btn" class="wish-btn" style="position:static" onclick="toggleWishlist(modalProduct.id,event)" aria-label="save to wishlist">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+        </button>
+      </div>
       <p id="pm-desc" style="font-size:12px;line-height:1.8;color:rgba(255,255,255,.45);margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,.06)"></p>
       <!-- Colour -->
       <div class="pm-section-label" style="font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:10px">colour</div>
@@ -669,10 +678,11 @@ footer{padding:60px 24px 40px;border-top:1px solid rgba(255,255,255,.06);max-wid
         add to cart
       </button>
       <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.05)">
-        <span style="font-size:9px;color:rgba(255,255,255,.22);letter-spacing:.1em;text-transform:uppercase">✦ free shipping over R800</span>
+        <span style="font-size:9px;color:rgba(255,255,255,.22);letter-spacing:.1em;text-transform:uppercase">✦ free shipping over R500</span>
         <span style="font-size:9px;color:rgba(255,255,255,.22);letter-spacing:.1em;text-transform:uppercase">✦ 30-day returns</span>
         <span style="font-size:9px;color:rgba(255,255,255,.22);letter-spacing:.1em;text-transform:uppercase">✦ sa made</span>
       </div>
+      <div id="pm-reviews-section" style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(255,255,255,.06)"></div>
     </div>
   </div>
 </div>
@@ -753,6 +763,7 @@ footer{padding:60px 24px 40px;border-top:1px solid rgba(255,255,255,.06);max-wid
     <div class="account-tabs">
       <button class="account-tab active" onclick="switchTab('login')">Sign In</button>
       <button class="account-tab" onclick="switchTab('orders')">Orders</button>
+      <button class="account-tab" onclick="switchTab('wishlist')">Wishlist</button>
       <button class="account-tab" onclick="switchTab('settings')">Settings</button>
     </div>
     <div class="account-panel active" id="tab-login">
@@ -772,6 +783,7 @@ footer{padding:60px 24px 40px;border-top:1px solid rgba(255,255,255,.06);max-wid
       <div id="profile-view" style="display:none"><div class="profile-header"><div class="profile-avatar" id="profileInitial">C</div><div><div class="profile-name" id="profileName">User</div><div class="profile-email" id="profileEmail">user@email.com</div></div><button class="logout-btn" onclick="doLogout()">sign out</button></div><p style="font-size:13px;color:rgba(255,255,255,.4)">you're signed in. use the tabs above to view your orders or update settings.</p></div>
     </div>
     <div class="account-panel" id="tab-orders"><div id="orders-list"></div></div>
+    <div class="account-panel" id="tab-wishlist"><div id="wishlist-list"></div></div>
     <div class="account-panel" id="tab-settings"><div id="settings-content"><p style="font-size:13px;color:rgba(255,255,255,.35)">sign in to manage your settings.</p></div></div>
   </div>
 </div>
@@ -973,6 +985,158 @@ const sb={
 
 /* ══ PRODUCTS ══ */
 let PRODUCTS = [];
+let wishlistIds = new Set();
+
+async function loadWishlist(){
+  if(!currentUser) return;
+  try{
+    const rows = await sb.get('wishlists', `?user_id=eq.${currentUser.id}&select=product_id`);
+    if(Array.isArray(rows)) wishlistIds = new Set(rows.map(r=>r.product_id));
+    document.querySelectorAll('.wish-btn').forEach(btn=>{
+      const pid=btn.dataset.pid;
+      btn.classList.toggle('active', wishlistIds.has(pid));
+    });
+  }catch(e){ console.warn('Failed to load wishlist', e); }
+}
+
+function isWishlisted(pid){ return wishlistIds.has(pid); }
+
+async function toggleWishlist(pid, evt){
+  if(evt) evt.stopPropagation();
+  if(!currentUser){ openAccount(); showToast('sign in to save favourites', 'error'); return; }
+  const nowActive = !wishlistIds.has(pid);
+  // Optimistic UI update
+  document.querySelectorAll(`.wish-btn[data-pid="${pid}"]`).forEach(btn=>btn.classList.toggle('active', nowActive));
+  if(nowActive) wishlistIds.add(pid); else wishlistIds.delete(pid);
+  try{
+    if(nowActive){
+      await sb.post('wishlists', {user_id: currentUser.id, product_id: pid});
+    }else{
+      await sb.del('wishlists', `?user_id=eq.${currentUser.id}&product_id=eq.${pid}`);
+    }
+  }catch(e){
+    // Revert on failure
+    if(nowActive) wishlistIds.delete(pid); else wishlistIds.add(pid);
+    document.querySelectorAll(`.wish-btn[data-pid="${pid}"]`).forEach(btn=>btn.classList.toggle('active', wishlistIds.has(pid)));
+    showToast('failed to update wishlist','error');
+  }
+  if(document.getElementById('tab-wishlist')?.classList.contains('active')) renderWishlist();
+}
+
+function renderWishlist(){
+  const container=document.getElementById('wishlist-list');
+  if(!container) return;
+  if(!currentUser){ container.innerHTML='<p style="font-size:13px;color:rgba(255,255,255,.35)">sign in to see your saved items.</p>'; return; }
+  const items = PRODUCTS.filter(p=>wishlistIds.has(p.id));
+  if(!items.length){ container.innerHTML='<p style="font-size:13px;color:rgba(255,255,255,.35)">nothing saved yet — tap the heart on any product to add it here.</p>'; return; }
+  container.innerHTML = items.map(p=>`
+    <div style="display:flex;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.06)">
+      <div style="width:64px;height:80px;background:#d4d1cc;border-radius:8px;overflow:hidden;flex-shrink:0;cursor:pointer" onclick="closeAccount();openProductModal('${p.id}')">
+        <img src="${p.front}" style="width:100%;height:100%;object-fit:contain" alt="${p.name}"/>
+      </div>
+      <div style="flex:1;min-width:0;cursor:pointer" onclick="closeAccount();openProductModal('${p.id}')">
+        <div style="font-size:13px;font-weight:600;color:#fff">${p.name}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:2px">${formatPrice(p.price)}</div>
+      </div>
+      <button onclick="toggleWishlist('${p.id}',event)" style="background:none;border:1px solid rgba(255,255,255,.15);border-radius:999px;padding:8px 14px;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.6);cursor:pointer">remove</button>
+    </div>
+  `).join('');
+}
+
+let reviewDraftRating = 0;
+
+async function loadReviews(pid){
+  const container=document.getElementById('pm-reviews-section');
+  if(!container) return;
+  container.innerHTML='<div style="font-size:11px;color:rgba(255,255,255,.3)">loading reviews...</div>';
+  try{
+    const reviews = await sb.get('reviews', `?product_id=eq.${pid}&select=*&order=created_at.desc`);
+    renderReviewsSection(pid, Array.isArray(reviews)?reviews:[]);
+  }catch(e){
+    container.innerHTML='<div style="font-size:11px;color:rgba(255,255,255,.3)">couldn\u2019t load reviews right now.</div>';
+  }
+}
+
+function starIcons(rating, size=13){
+  let out='';
+  for(let i=1;i<=5;i++){
+    const filled = i<=Math.round(rating);
+    out += `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${filled?'#e63329':'none'}" stroke="${filled?'#e63329':'rgba(255,255,255,.25)'}" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>`;
+  }
+  return `<span style="display:inline-flex;gap:1px">${out}</span>`;
+}
+
+function renderReviewsSection(pid, reviews){
+  const container=document.getElementById('pm-reviews-section');
+  const avg = reviews.length ? (reviews.reduce((s,r)=>s+r.rating,0)/reviews.length) : 0;
+  const alreadyReviewed = currentUser && reviews.some(r=>r.user_id===currentUser.id);
+
+  let html = `<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+    ${starIcons(avg,15)}
+    <span style="font-size:13px;font-weight:600;color:#fff">${reviews.length?avg.toFixed(1):'no reviews yet'}</span>
+    ${reviews.length?`<span style="font-size:11px;color:rgba(255,255,255,.4)">(${reviews.length} review${reviews.length===1?'':'s'})</span>`:''}
+  </div>`;
+
+  if(!currentUser){
+    html += `<div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:20px">sign in to leave a review.</div>`;
+  }else if(alreadyReviewed){
+    html += `<div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:20px">you've already reviewed this product — thanks!</div>`;
+  }else{
+    reviewDraftRating = 0;
+    html += `<div style="margin-bottom:24px;padding:16px;background:rgba(255,255,255,.03);border-radius:10px">
+      <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:10px">leave a review</div>
+      <div id="review-star-input" style="display:flex;gap:4px;margin-bottom:12px;cursor:pointer"></div>
+      <textarea id="review-comment" placeholder="what did you think? (optional)" style="width:100%;background:#151515;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#fff;padding:10px;font-family:inherit;font-size:12px;resize:vertical;min-height:60px;margin-bottom:10px"></textarea>
+      <button onclick="submitReview('${pid}')" style="background:#e63329;color:#fff;border:none;border-radius:999px;padding:10px 20px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer">submit review</button>
+    </div>`;
+  }
+
+  html += reviews.map(r=>`
+    <div style="padding:14px 0;border-top:1px solid rgba(255,255,255,.05)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        ${starIcons(r.rating,12)}
+        ${r.verified_purchase?'<span style="font-size:9px;color:#4ade80;letter-spacing:.05em;text-transform:uppercase">verified purchase</span>':''}
+      </div>
+      ${r.comment?`<p style="font-size:12px;color:rgba(255,255,255,.6);line-height:1.6">${r.comment}</p>`:''}
+      <div style="font-size:10px;color:rgba(255,255,255,.25);margin-top:6px">${new Date(r.created_at).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})}</div>
+    </div>
+  `).join('');
+
+  container.innerHTML = html || container.innerHTML;
+
+  if(currentUser && !alreadyReviewed){
+    const starInput=document.getElementById('review-star-input');
+    if(starInput) renderStarInput(starInput);
+  }
+}
+
+function renderStarInput(container){
+  container.innerHTML = [1,2,3,4,5].map(i=>`
+    <svg data-star="${i}" width="22" height="22" viewBox="0 0 24 24" fill="${i<=reviewDraftRating?'#e63329':'none'}" stroke="${i<=reviewDraftRating?'#e63329':'rgba(255,255,255,.3)'}" stroke-width="1.5" onclick="setReviewDraftRating(${i})"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+  `).join('');
+}
+
+function setReviewDraftRating(n){
+  reviewDraftRating = n;
+  const starInput=document.getElementById('review-star-input');
+  if(starInput) renderStarInput(starInput);
+}
+
+async function submitReview(pid){
+  if(!currentUser){ showToast('sign in to leave a review','error'); return; }
+  if(reviewDraftRating < 1){ showToast('pick a star rating first','error'); return; }
+  const comment = document.getElementById('review-comment')?.value.trim() || null;
+  try{
+    const res = await sb.post('reviews', { product_id: pid, user_id: currentUser.id, rating: reviewDraftRating, comment });
+    if(res.error){ showToast(res.error.message || 'failed to submit review','error'); return; }
+    showToast('review submitted — thank you!','success');
+    loadReviews(pid);
+    const prod = PRODUCTS.find(p=>p.id===pid);
+    if(prod){ prod.reviewCount=(prod.reviewCount||0)+1; }
+  }catch(e){
+    showToast('failed to submit review','error');
+  }
+}
 
 // Products whose photos are full-body lifestyle shots rather than tight product shots —
 // these get object-fit:cover with a tuned focal point instead of the default contain,
@@ -1037,12 +1201,18 @@ function buildGrids(){
       const zoom=LIFESTYLE_PHOTOS[p.id];
       const imgStyle=zoom?`width:100%;height:100%;object-fit:cover;object-position:${zoom.pos};display:block`:`width:100%;height:100%;object-fit:contain;display:block`;
       return`<div class="mini-card" onclick="openProductModal('${p.id}')">
-        <div class="mini-card-visual" style="overflow:hidden;display:flex;align-items:center;justify-content:center">
+        <div class="mini-card-visual" style="overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative">
           <img src="${p.front}" style="${imgStyle}" alt="${p.name}" loading="lazy"/>
+          <button class="wish-btn${wishlistIds.has(p.id)?' active':''}" data-pid="${p.id}" onclick="toggleWishlist('${p.id}',event)" aria-label="save to wishlist">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+          </button>
         </div>
         <div class="mini-card-info">
           <div class="mini-card-name">${p.name}</div>
-          <div class="mini-card-price">${priceHtml}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div class="mini-card-price">${priceHtml}</div>
+            ${p.reviewCount>0?`<div style="display:flex;align-items:center;gap:3px;font-size:11px;color:rgba(255,255,255,.5)"><svg width="11" height="11" viewBox="0 0 24 24" fill="#e63329"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>${p.avgRating} (${p.reviewCount})</div>`:''}
+          </div>
         </div>
       </div>`;
     }).join('');
@@ -1058,6 +1228,9 @@ function openProductModal(pid){
   document.getElementById('pm-name').textContent=p.name;
   document.getElementById('pm-desc').textContent=p.desc;
   document.getElementById('pm-price').textContent=formatPrice(p.price);
+  const wishBtn=document.getElementById('pm-wish-btn');
+  if(wishBtn) wishBtn.classList.toggle('active', wishlistIds.has(p.id));
+  loadReviews(p.id);
   const frontImg=document.getElementById('pm-front-img');
   const backImg=document.getElementById('pm-back-img');
   frontImg.src=p.front||''; backImg.src=p.back||p.front||'';
@@ -1256,11 +1429,12 @@ function checkPaymentReturnStatus(){
 function openAccount(){document.getElementById('account-page').classList.add('open');refreshAccountUI();document.body.style.overflow='hidden';}
 function closeAccount(){document.getElementById('account-page').classList.remove('open');document.body.style.overflow='';}
 function switchTab(tab){
-  ['login','orders','settings'].forEach((t,i)=>{
+  ['login','orders','wishlist','settings'].forEach((t,i)=>{
     document.querySelectorAll('.account-tab')[i]?.classList.toggle('active',t===tab);
     document.getElementById('tab-'+t)?.classList.toggle('active',t===tab);
   });
   if(tab==='orders')renderOrders();
+  if(tab==='wishlist')renderWishlist();
   if(tab==='settings')renderSettings();
 }
 function refreshAccountUI(){
@@ -1272,7 +1446,8 @@ function refreshAccountUI(){
     document.getElementById('profileName').textContent=name;
     document.getElementById('profileEmail').textContent=currentUser.email;
     document.getElementById('profileInitial').textContent=name.charAt(0).toUpperCase();
-  }else{lf.style.display='block';rf.style.display='none';pv.style.display='none';}
+    loadWishlist();
+  }else{lf.style.display='block';rf.style.display='none';pv.style.display='none';wishlistIds=new Set();}
 }
 function hideAllAuthScreens(){
   ['login-form','register-form','pending-confirm','forgot-form','forgot-sent','new-password-form','profile-view'].forEach(id=>{
@@ -1642,8 +1817,13 @@ refreshAccountUI();
 <script>
 async function loadProductsFromSupabase(){
   try{
-    const rows = await sb.get('products','?select=id,name,category,price,description,sizes,sold_out_sizes,in_stock,image_front,image_back');
+    const [rows, ratings] = await Promise.all([
+      sb.get('products','?select=id,name,category,price,description,sizes,sold_out_sizes,in_stock,image_front,image_back'),
+      sb.get('product_rating_summary','?select=product_id,avg_rating,review_count')
+    ]);
     if(!Array.isArray(rows)) return;
+    const ratingById = {};
+    if(Array.isArray(ratings)) ratings.forEach(r=>{ ratingById[r.product_id] = r; });
     PRODUCTS = rows
       .filter(r => r.image_front) // skip products that don't have images uploaded yet
       .map(r => ({
@@ -1656,7 +1836,9 @@ async function loadProductsFromSupabase(){
         soldOut: r.sold_out_sizes || [],
         discontinued: r.in_stock === false,
         front: r.image_front || '',
-        back: r.image_back || r.image_front || ''
+        back: r.image_back || r.image_front || '',
+        avgRating: ratingById[r.id]?.avg_rating ? parseFloat(ratingById[r.id].avg_rating) : null,
+        reviewCount: ratingById[r.id]?.review_count || 0
       }));
   }catch(e){ console.error('Failed to load products from Supabase', e); }
 }
